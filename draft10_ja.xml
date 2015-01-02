@@ -1082,29 +1082,24 @@ else
                     TLS がコンテンツの秘密保護を提供している間、そのコンテンツの
                     長さに関しては限られた量の保護のみしか提供されないためです。
                     <list style="hanging">
-                        <t hangText="Note:">
-                            パティングスキームは攻撃者に対する限られた保護のみ提供します。
-
-                            Padding schemes only provide limited protection
-                            against an attacker with these capabilities,
-                            potentially only forcing an increased number of
-                            guesses to learn the length associated with a given
-                            guess.  Padding schemes also work directly against
-                            compression by increasing the number of bits that
-                            are transmitted.
+                        <t hangText="注意:">
+                            パティングスキームは推測の増加数が与えらた推測に
+                            関連付いた長さを学習することを強制する可能性
+                            あるようなこれらの能力を伴った攻撃者に対する限られた
+                            保護のみ提供します。
+                            パディングスキームは送信されたビット数の増加によって
+                            圧縮に対しても直接作用します。
                         </t>
                     </list>
                 </t>
                 <t>
                     <xref target="CRIME">CRIME</xref>  のような攻撃はこれらの
-                    一般的な攻撃者の能力の存在を存在しています。
-                    Attacks like <xref target="CRIME">CRIME</xref> demonstrated
-                    the existence of these general attacker capabilities.  The
-                    specific attack exploited the fact that <xref
-                        target="DEFLATE">DEFLATE</xref> removes redundancy based
-                    on prefix matching.  This permitted the attacker to confirm
-                    guesses a character at a time, reducing an exponential-time
-                    attack into a linear-time attack.
+                    一般的な攻撃者の能力の存在を証明しています。
+                    このような攻撃は <xref target="DEFLATE">DEFLATE</xref> が
+                    プレフィックスマッチングに基づき冗長性を減らす事実を
+                    悪用しています。これは同時に攻撃者に文字の推測を検証する
+                    ことを許してしまい、指数関数時間の攻撃から線形時間の攻撃に
+                    してしまいます。
                 </t>
 
                 <section title="HPACK と HTTP への適応性">
@@ -1179,37 +1174,36 @@ else
                         値は全リクエストで使用可能にします。
                     </t>
                     <t>
-                        An encoder without good knowledge of the provenance of
-                        header fields might instead introduce a penalty for bad
-                        guesses, such that attempts to guess a header field
-                        value results in all values being removed from
-                        consideration in all future requests, effectively
-                        preventing further guesses.
+                        ヘッダフィールドの出処の良い情報を持たないエンコーダは
+                        代わりに悪い推測の報いを受ける可能性があります。
+                        更なる推測を効率的に防ぐため、すべての将来の
+                        リクエストにおける懸念からすべての値が削除されることに
+                        なるヘッダフィールド値の推測を試みるような。
                         <list style="hanging">
-                            <t hangText="Note:">
-                                Simply removing values from the dynamic table
-                                can be ineffectual if the attacker has a
-                                reliable way of causing values to be
-                                reinstalled.  For example, a request to load an
-                                image in a web browser typically includes the
-                                Cookie header field (a potentially highly valued
-                                target for this sort of attack), and web sites
-                                can easily force an image to be loaded, thereby
-                                refreshing the entry in the dynamic table.
+                            <t hangText="注意:">
+                                もし攻撃者が値の再入を行える信頼できる経路を
+                                持つ場合、動的テーブルからの値の単純な削除では
+                                不十分である可能性があります。例えば、
+                                web ブラウザにおいて画像を読み込むための
+                                リクエストは典型的に Cookie ヘッダフィールド
+                                (この種類の攻撃で価値あるターゲットである可能性が
+                                高い) を含み、 web サイトは簡単に画像が
+                                読み込まれることを強制できるので、それによって
+                                動的テーブルのエントリはリフレッシュされます。
                             </t>
                         </list>
                     </t>
                     <t>
-                        This response might be made inversely proportional to
-                        the length of the header field.  Marking as inaccessible
-                        might occur for shorter values more quickly or with
-                        higher probability than for longer values.
+                        このレスポンスはヘッダフィールドの長さと比較して逆に
+                        作成される場合があります。アクセス不可能とマークする
+                        ことで短い値をより素早く、長い値より高い確率を伴って
+                        起こる可能性があります。
                     </t>
                     <t>
-                        Implementations might also choose to protect certain
-                        header fields that are known to be highly valued, such
-                        as the Authorization or Cookie header fields, by
-                        disabling or further limiting compression.
+                        圧縮を無効にするか更なる制限を行うことによって、
+                        実装は Authorization や Cookie ヘッダフィールドなどの
+                        価値の高いことで知られる信頼できるヘッダフィールドを
+                        保護するのを選ぶこともできます。
                     </t>
                 </section>
 
