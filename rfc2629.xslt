@@ -692,7 +692,7 @@
 
 <xsl:template match="abstract">
   <xsl:call-template name="check-no-text-content"/>
-  <h1 id="{$anchor-prefix}.abstract"><a href="#{$anchor-prefix}.abstract">Abstract</a></h1>
+  <h1 id="{$anchor-prefix}.abstract"><a href="#{$anchor-prefix}.abstract">概要</a></h1>
   <xsl:apply-templates />
 </xsl:template>
 
