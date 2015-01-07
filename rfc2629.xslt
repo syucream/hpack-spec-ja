@@ -157,7 +157,7 @@
   <xsl:call-template name="parse-pis">
     <xsl:with-param name="nodes" select="/processing-instruction('rfc')"/>
     <xsl:with-param name="attr" select="'refparent'"/>
-    <xsl:with-param name="default" select="'References'"/>
+    <xsl:with-param name="default" select="'参考文献'"/>
   </xsl:call-template>
 </xsl:param>
 
@@ -5801,7 +5801,7 @@ dd, li, p {
 
   <div id="{$anchor-prefix}.toc">
     <h1 class="np"> <!-- this pagebreak occurs always -->
-      <a href="#{$anchor-prefix}.toc">Table of Contents</a>
+      <a href="#{$anchor-prefix}.toc">目次</a>
     </h1>
   
     <ul class="toc">
