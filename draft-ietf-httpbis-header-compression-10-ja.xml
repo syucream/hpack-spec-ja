@@ -1839,8 +1839,8 @@ EOS (256)  |11111111|11111111|11111111|111111      3fffffff  [30]
             <t>
                 リクエストとレスポンス両方の、ハフマン符号化を伴う場合と
                 伴わない場合の、整数、ヘッダフィールド表現そしてヘッダ
-                フィールドのリストのすべてののエンコーディングを含む
-                数多くの例がここにあります。
+                フィールドのリストのすべてのエンコーディングを含む
+                数多くの例があります。
             </t>
 
             <section title="整数表現の例"
@@ -2017,7 +2017,7 @@ EOS (256)  |11111111|11111111|11111111|111111      3fffffff  [30]
         </t>
         <t>
             <figure>
-                <preamble>エンコードされたデータの 16 進ダンプ:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork>
 <![CDATA[040c 2f73 616d 706c 652f 7061 7468      | ../sample/path]]></artwork>
             </figure>
@@ -2061,7 +2061,7 @@ EOS (256)  |11111111|11111111|11111111|111111      3fffffff  [30]
         </t>
         <t>
             <figure>
-                <preamble>エンコードされたデータの 16 進ダンプ:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork>
 <![CDATA[1008 7061 7373 776f 7264 0673 6563 7265 | ..password.secre
 74                                      | t]]></artwork>
@@ -2138,7 +2138,7 @@ EOS (256)  |11111111|11111111|11111111|111111      3fffffff  [30]
         この節は同じコネクションにおける HTTP リクエストに対応した
         幾つかの連続したヘッダリストを示します。
     </t>
-    <section title="最初のリクエスト">
+    <section title="一個目のリクエスト">
         <t>
             <figure>
                 <preamble>エンコードするヘッダリスト:</preamble>
@@ -2151,7 +2151,7 @@ EOS (256)  |11111111|11111111|11111111|111111      3fffffff  [30]
         </t>
         <t>
             <figure>
-                <preamble>エンコードされたデータの 16 進ダンプ:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork>
 <![CDATA[8286 8441 0f77 7777 2e65 7861 6d70 6c65 | ...A.www.example
 2e63 6f6d                               | .com]]></artwork>
@@ -2213,7 +2213,7 @@ cache-control: no-cache]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>エンコードされたデータの 16 進ダンプ:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork>
 <![CDATA[8286 84be 5808 6e6f 2d63 6163 6865      | ....X.no-cache]]></artwork>
             </figure>
@@ -2279,7 +2279,7 @@ custom-key: custom-value]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>エンコードされたデータの 16 進ダンプ:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork>
 <![CDATA[8287 85bf 400a 6375 7374 6f6d 2d6b 6579 | ....@.custom-key
 0c63 7573 746f 6d2d 7661 6c75 65        | .custom-value]]></artwork>
@@ -2341,7 +2341,7 @@ custom-key: custom-value]]></artwork>
         この節では前節と同じ例を示しますが、リテラル値にハフマン符号化を
         行います。
     </t>
-    <section title="最初のリクエスト">
+    <section title="一個目のリクエスト">
         <t>
             <figure>
                 <preamble>エンコードするヘッダリスト:</preamble>
@@ -2354,7 +2354,7 @@ custom-key: custom-value]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>エンコードされたデータの 16 進ダンプ:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork>
 <![CDATA[8286 8441 8cf1 e3c2 e5f2 3a6b a0ab 90f4 | ...A......:k....
 ff                                      | .]]></artwork>
@@ -2419,7 +2419,7 @@ cache-control: no-cache]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>エンコードされたデータの 16 進ダンプ:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork>
 <![CDATA[8286 84be 5886 a8eb 1064 9cbf           | ....X....d..]]></artwork>
             </figure>
@@ -2488,7 +2488,7 @@ custom-key: custom-value]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>エンコードされたデータの 16 進ダンプ:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork>
 <![CDATA[8287 85bf 4088 25a8 49e9 5ba9 7d7f 8925 | ....@.%.I.[.}..%
 a849 e95b b8e8 b4bf                     | .I.[....]]></artwork>
@@ -2558,7 +2558,7 @@ custom-key: custom-value]]></artwork>
         SETTINGS_HEADER_TABLE_SIZE は幾つかの削除を起こすため、 256 
         オクテットの値で設定されています。
     </t>
-    <section title="最初のレスポンス">
+    <section title="一個目のレスポンス">
         <t>
             <figure>
                 <preamble>エンコードするヘッダリスト:</preamble>
@@ -2571,7 +2571,7 @@ location: https://www.example.com]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>エンコードされたデータの 16 進ダンプ:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork>
 <![CDATA[4803 3330 3258 0770 7269 7661 7465 611d | H.302X.privatea.
 4d6f 6e2c 2032 3120 4f63 7420 3230 3133 | Mon, 21 Oct 2013
@@ -2654,7 +2654,7 @@ location: https://www.example.com]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>エンコードされたデータの 16 進ダンプ:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork>
 <![CDATA[4803 3330 37c1 c0bf                     | H.307...]]></artwork>
             </figure>
@@ -2725,7 +2725,7 @@ set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1]]></artwork
         </t>
         <t>
             <figure>
-                <preamble>エンコードされたデータの 16 進ダンプ:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork>
 <![CDATA[88c1 611d 4d6f 6e2c 2032 3120 4f63 7420 | ..a.Mon, 21 Oct
 3230 3133 2032 303a 3133 3a32 3220 474d | 2013 20:13:22 GM
@@ -2819,7 +2819,7 @@ set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1]]></artwork
         オクテットの値で設定されています。削除メカニズムはデコードされた
         リテラル値の長さを使用するため、前節と同じ削除処理が起こります。
     </t>
-    <section title="最初のレスポンス">
+    <section title="一個目のレスポンス">
         <t>
             <figure>
                 <preamble>エンコードするヘッダリスト:</preamble>
@@ -2832,7 +2832,7 @@ location: https://www.example.com]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>エンコードされたデータの 16 進ダンプ:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork>
 <![CDATA[4882 6402 5885 aec3 771a 4b61 96d0 7abe | H.d.X...w.Ka..z.
 9410 54d4 44a8 2005 9504 0b81 66e0 82a6 | ..T.D. .....f...
@@ -2927,7 +2927,7 @@ location: https://www.example.com]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>エンコードされたデータの 16 進ダンプ:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork>
 <![CDATA[4883 640e ffc1 c0bf                     | H.d.....]]></artwork>
             </figure>
@@ -3001,7 +3001,7 @@ set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1]]></artwork
         </t>
         <t>
             <figure>
-                <preamble>エンコードされたデータの 16 進ダンプ:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork>
 <![CDATA[88c1 6196 d07a be94 1054 d444 a820 0595 | ..a..z...T.D. ..
 040b 8166 e084 a62d 1bff c05a 839b d9ab | ...f...-...Z....
