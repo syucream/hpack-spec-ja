@@ -1320,7 +1320,7 @@ else
                     <date month="October" year="2014"/>
                 </front>
                 <seriesInfo name="Internet-Draft" value="draft-ietf-httpbis-http2-16"/>
-                <x:source href="refs/draft-ietf-httpbis-http2-16.xml"/>
+                <x:source href="http2-spec/refs/draft-ietf-httpbis-http2-16.xml"/>
             </reference>
 
             <reference anchor="RFC7230">
