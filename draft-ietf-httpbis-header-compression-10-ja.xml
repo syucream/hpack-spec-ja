@@ -3222,7 +3222,7 @@ set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1]]></artwork
                         例の更新: 仕様内の変更を考慮し、更なる特徴を示す。
                     </t>
                     <t>
-                        'バイト' と 'オクテット' の両方を使用する代わりにどこでも
+                        'バイト' と 'オクテット' の両方を使用する代わりに
                         'オクテット' に統一。
                     </t>
                     <t>
