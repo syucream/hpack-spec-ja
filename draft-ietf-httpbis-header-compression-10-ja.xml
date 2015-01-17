@@ -86,7 +86,7 @@
                 <xref target="DEFLATE">DEFLATE</xref> フォーマットを使用して
                 ヘッダフィールドを圧縮することによりこの無駄に取り組みました。
                 しかしながら、このアプローチは CRIME 攻撃で実証された通り
-                セキュリティリスクに晒されます。 (<xref target="CRIME"/>を参照)
+                セキュリティリスクがあります。 (<xref target="CRIME"/>を参照)
             </t>
 
             <t>
