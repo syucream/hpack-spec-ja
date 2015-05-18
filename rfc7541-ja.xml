@@ -19,7 +19,7 @@
 <rfc ipr="trust200902" number="7541" category="std" consensus="yes">
     
     <front>
-        <title abbrev="HPACK">HPACK - Header Compression for HTTP/2</title>
+        <title abbrev="HPACK">HPACK - HTTP/2 のためのヘッダ圧縮</title>
 
         <author initials="R." surname="Peon" fullname="Roberto Peon">
             <organization>Google, Inc</organization>
@@ -42,217 +42,221 @@
         <keyword>Header</keyword>
         <abstract>
             <t>
-                This specification defines HPACK, a compression format for
-                efficiently representing HTTP header fields, to be used in
-                HTTP/2.
+                この仕様書は HTTP/2 で使われる HTTP ヘッダフィールドを
+                効率的に表現する圧縮フォーマット HPACK を定義
+                します。
             </t>
         </abstract>
 
     </front>
 
     <middle>
-        <section title="Introduction">
+        <section title="はじめに">
             <t>
-                In HTTP/1.1 (see <xref target="RFC7230"/>), header fields are
-                not compressed. As Web pages have grown to require dozens to
-                hundreds of requests, the redundant header fields in these
-                requests unnecessarily consume bandwidth, measurably increasing
-                latency.
+                HTTP/1.1 (<xref target="RFC7230"/> を参照) において、
+                ヘッダフィールドは圧縮されません。 Web ページは 12 から数百の
+                リクエストを含むようになってきており、これらのリクエストの中の
+                余分なヘッダフィールドは不必要に帯域を消費し、レイテンシを
+                大きく増加します。
             </t>
 
             <t>
-                <xref target="SPDY">SPDY</xref> initially addressed this
-                redundancy by compressing header fields using the <xref target="DEFLATE">DEFLATE</xref> format, which proved very
-                effective at efficiently representing the redundant header
-                fields.  However, that approach exposed a security risk as
-                demonstrated by the CRIME attack (see <xref target="CRIME"/>).
+                <xref target="SPDY">SPDY</xref> は最初、余分なヘッダフィールド
+                を効率的に表現することで非常に効率的にする
+                <xref target="DEFLATE">DEFLATE</xref> フォーマットを使用して
+                ヘッダフィールドを圧縮することによりこの無駄に取り組みました。
+                しかしながら、このアプローチは CRIME 攻撃で実証された通り
+                セキュリティリスクがあります。 (<xref target="CRIME"/>を参照)
             </t>
 
             <t>
-                This specification defines HPACK, a new compressor for header
-                fields which eliminates redundant header fields, limits
-                vulnerability to known security attacks, and which has a bounded
-                memory requirement for use in constrained environments.
-                Potential security concerns for HPACK are described in <xref target="Security"/>.
+                この仕様書は余分なヘッダフィールドを消去し、既知のセキュリティ
+                攻撃への脆弱性を抑制し、そして制限された環境で使用する
+                制限されたメモリ要求を持つヘッダフィールドの新しい圧縮方式
+                HPACK を定義します。 HPACK の潜在的なセキュリティへの懸念は
+                <xref target="Security"/> に記述します。
             </t>
 
             <t>
-                The HPACK format is intentionally simple and inflexible.  Both
-                characteristics reduce the risk of interoperability or security
-                issues due to implementation error.  No extensibility
-                mechanisms are defined; changes to the format are only possible
-                by defining a complete replacement.
+                HPACK のフォーマットは意図的にシンプルで柔軟性を欠かせています。
+                この二つの特徴によって実装の誤りによる相互運用性とセキュリティ
+                イシューのリスクを減らします。拡張メカニズムは定義されて
+                いません。フォーマットの変更は完全な代替仕様の定義によって
+                のみ成り立ちます。
             </t>
 
-            <section title="Overview">
+            <section title="概要">
                 <t>
-                    The format defined in this specification treats a list of
-                    header fields as an ordered collection of name-value pairs
-                    that can include duplicate pairs. Names and values are
-                    considered to be opaque sequences of octets, and the order
-                    of header fields is preserved after being compressed and
-                    decompressed.
+                    この仕様で定義されるフォーマットはヘッダフィールドのリストを
+                    重複可能な名前と値のペアの順序付けられたコレクションとして扱います。
+                    名前と値は不透明なオクテットの並びになることを考慮し、ヘッダ
+                    フィールドの順序は圧縮と展開の後で保存されます。
                 </t>
                 <t>
-                    Encoding is informed by header field tables that map
-                    header fields to indexed values. These header field tables
-                    can be incrementally updated as new header fields are
-                    encoded or decoded.
+                    エンコーディングは名前と値のペアとインデックスされた値を
+                    マップするヘッダテーブルによって決まります。これらの
+                    ヘッダテーブルは、新しいペアをエンコードもしくはデコードする
+                    時に増分更新を行えます。
                 </t>
                 <t>
-                    In the encoded form, a header field is represented either
-                    literally or as a reference to a header field in one of
-                    the header field tables. Therefore, a list of header fields
-                    can be encoded using a mixture of references and literal
-                    values.
+                    エンコードされた形式内で、ヘッダフィールドはリテラルもしくは
+                    ヘッダテーブル内の一つの名前と値のペアへの参照として表現
+                    されます。従って、ヘッダフィールドのリストは参照とリテラル値を
+                    混ぜ合わせてエンコードできます。
                 </t>
                 <t>
-                    Literal values are either encoded directly or using a static
-                    Huffman code.
+                    リテラル値は直接エンコードされるか静的なハフマン符号を
+                    使います。
                 </t>
                 <t>
-                    The encoder is responsible for deciding which header fields
-                    to insert as new entries in the header field tables.  The
-                    decoder executes the modifications to the header field
-                    tables prescribed by the encoder, reconstructing the list of
-                    header fields in the process.  This enables decoders to
-                    remain simple and interoperate with a wide variety of
-                    encoders.
+                    エンコーダはヘッダテーブルに新しいエントリとして挿入する
+                    ヘッダフィールドを決定する責任があります。デコーダは
+                    エンコーダによって定められたヘッダテーブルに対する修正を行い、
+                    その処理内でヘッダフィールドのリストを再構築します。
+                    これによりデコーダをシンプル化し、非常に様々なエンコーダと
+                    相互運用可能にすることができます。
                 </t>
                 <t>
-                    Examples illustrating the use of these different mechanisms
-                    to represent header fields are available in <xref target="examples"/>.
+                    ヘッダフィールドを表現するためのこれらの異なったメカニズムの使用
+                    を解説する例は <xref target="examples"/> にあります。
                 </t>
             </section>
 
-            <section anchor="conventions" title="Conventions">
+            <section title="表記" anchor="conventions">
                 <t>
-                    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
-                    "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY",
-                    and "OPTIONAL" in this document are to be interpreted as
-                    described in <xref target="RFC2119">RFC 2119</xref>.
+                    この文書のキーワード "MUST", "MUST NOT", "REQUIRED",
+                    "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",
+                    "MAY", そして "OPTIONAL" は <xref target="RFC2119">RFC 2119</xref>
+                    に記述された通りに解釈されます。
                 </t>
                 <t>
-                    All numeric values are in network byte order.  Values are
-                    unsigned unless otherwise indicated.  Literal values are
-                    provided in decimal or hexadecimal as appropriate.
+                    全ての数値はネットワークバイトオーダーです。特に断りが
+                    無い限り値は符号なしです。リテラルの値は必要に応じて
+                    10 進数または 16 進数で与えられます。
                 </t>
 
             </section>
 
-            <section anchor="encoding.concepts" title="Terminology">
+            <section title="用語" anchor="encoding.concepts">
                 <t>
-                    This specification uses the following terms:
+                    この仕様は下記の用語を使用します:
                     <list style="hanging">
-                        <t hangText="Header Field:">
-                            A name-value pair.  Both the name and value are
-                            treated as opaque sequences of octets.
+                        <t hangText="ヘッダフィールド:">
+                            名前と値のペア。名前と値どちらも不定なオクテットの
+                            連続として扱われます。
                         </t>
-                        <t hangText="Dynamic Table:">
-                            The dynamic table (see <xref target="dynamic.table"/>) is a table that
-                            associates stored header fields with index values.
-                            This table is dynamic and specific to an encoding or
-                            decoding context.
+                        <t hangText="動的テーブル:">
+                            動的テーブル (<xref target="dynamic.table"/> を参照)
+                            は保存されたヘッダフィールドとインデックス
+                            値を関連付けるのに使用されるヘッダテーブルです。
+                            このテーブルは動的でエンコーディングやデコーディング
+                            のコンテキスト特有です。
                         </t>
-                        <t hangText="Static Table:">
-                            The static table (see <xref target="static.table"/>)
-                            is a table that statically associates header fields
-                            that occur frequently
-                            with index values.  This table is ordered,
-                            read-only, always accessible, and may be shared
-                            amongst all encoding or decoding contexts.
+                        <t hangText="静的テーブル:">
+                            静的テーブル(<xref target="static.table"/> を参照)
+                            は静的なヘッダフィールドとインデックス
+                            値を関連づけるのに使用されるヘッダテーブルです。
+                            このテーブルは順序付けられ、リードオンリーであり、
+                            常にアクセス可能で、すべてのエンコーディングや
+                            デコーディングのコンテキストの間で共有される
+                            可能性があります。
                         </t>
-                        <t hangText="Header List:">
-                            A header list is an ordered collection of header
-                            fields that are encoded jointly, and can contain
-                            duplicate header fields. A complete list of
-                            header fields contained in an HTTP/2 header block
-                            is a header list.
+                        <t hangText="ヘッダリスト:">
+                            ヘッダリストは一緒にエンコードされるヘッダ
+                            フィールドの順序付けられたコレクションであり、重複した
+                            ヘッダフィールドを含むことができます。
+                            HTTP/2 ヘッダブロックに含まれるキーと値のペアの
+                            完全なリストがヘッダリストです。
                         </t>
-                        <t hangText="Header Field Representation:">
-                            A header field can be represented in encoded form
-                            either as a literal or as an index (see <xref target="header.representation"/>).
+                        <t hangText="ヘッダフィールド表現:">
+                            ヘッダフィールドはリテラルかインデックスの
+                            どちらかのエンコードされた形式で表現できます。
+                            (<xref target="header.representation"/> を参照)
                         </t>
-                        <t hangText="Header Block:">
-                            An ordered list of header field representations
-                            which, when decoded, yields a complete header list.
+                        <t hangText="ヘッダブロック:">
+                            デコード時に完全なヘッダリストを提供する
+                            ヘッダフィールド表現の順序付けられたリストです。
                         </t>
                     </list>
                 </t>
             </section>
         </section>
 
-        <section anchor="header.encoding" title="Compression Process Overview">
+        <section anchor="header.encoding" title="圧縮処理の概要">
             <t>
-                This specification does not describe a specific algorithm for an
-                encoder.  Instead, it defines precisely how a decoder is
-                expected to operate, allowing encoders to produce any encoding
-                that this definition permits.
+                この仕様ではエンコーダの為の特定のアルゴリズムについては記述
+                しません。代わりに、デコーダがどう処理することが期待され、
+                この定義で許されるエンコーディングを行う為にエンコーダに許される
+                ことを正確に定義します。
             </t>
 
-            <section anchor="header.list.ordering" title="Header List Ordering">
+            <section anchor="header.list.ordering" title="ヘッダリストの順序">
                 <t>
-                    HPACK preserves the ordering of header fields inside the
-                    header list. An encoder MUST order header field
-                    representations in the header block according to their
-                    ordering in the original header list. A decoder MUST
-                    order header fields in the decoded header list according to
-                    their ordering in the header block.
+                    HPACK はヘッダリスト内のヘッダフィールドの順序を保存します。
+                    エンコーダはオリジナルのヘッダリスト内の順序に従ってヘッダ
+                    ブロックのヘッダフィールド表現を順序付けなければなりません (MUST) 。
+                    デコーダはヘッダブロック内の順序によってデコードされたヘッダ
+                    リストのヘッダフィールドを順序付けなければなりません (MUST) 。
                 </t>
             </section>
 
-            <section anchor="encoding.context" title="Encoding and Decoding Contexts">
+            <section anchor="encoding.context" title="エンコーディングとデコーディングのコンテキスト">
                 <t>
-                    To decompress header blocks, a decoder only needs to
-                    maintain a dynamic table (see <xref target="dynamic.table"/>) as a decoding context. No
-                    other dynamic state is needed.
+                    ヘッダブロックを展開するため、デコーダはデコーディング
+                    コンテキストとして動的テーブル (<xref
+                        target="dynamic.table"/> を参照) の管理のみを
+                    必要とします。他に必要な状態はありません。
                 </t>
                 <t>
-                    When used for bidirectional communication, such as in HTTP,
-                    the encoding and decoding dynamic tables maintained by an
-                    endpoint are completely independent. I.e., the request
-                    and response dynamic tables are separate.
+                    HTTP のような双方向コミュニケーションに使用される際、
+                    エンコーディングとデコーディングの動的テーブルは
+                    完全に独立したエンドポイントによって管理されます。
+                    例えば、リクエストとレスポンスの動的テーブルは分離されます。
                 </t>
             </section>
 
-            <section anchor="indexing.tables" title="Indexing Tables">
+            <section anchor="indexing.tables" title="インデックステーブル">
                 <t>
-                    HPACK uses two tables for associating header fields to
-                    indexes. The static table (see <xref target="static.table"/>) is predefined and contains
-                    common header fields (most of them with an empty value). The
-                    dynamic table (see <xref target="dynamic.table"/>) is
-                    dynamic and can be used by the encoder to index header
-                    fields repeated in the encoded header lists.
+                    HPACK はヘッダフィールドとインデックスを関連付ける二つの
+                    テーブルを使用します。静的テーブル (<xref
+                        target="static.table"/> を参照) は予め定義されて
+                    おり、 (ほとんどは空の値を持った) よく使用されるヘッダフィールドを
+                    持ちます。動的テーブル (<xref target="dynamic.table"/> を
+                    参照) は動的であり、エンコーダによってエンコードされた
+                    ヘッダリスト内で繰り返し使用されるヘッダフィールドを指すのに
+                    使用できます。
                 </t>
                 <t>
-                    These two tables are combined into a single address space
-                    for defining index values (see <xref target="index.address.space"/>).
+                    これら二つのテーブルはインデックス値の定義のため単一のアドレス
+                    空間内で結合されます。 (<xref
+                        target="index.address.space"/> を参照)
                 </t>
 
-                <section anchor="static.table" title="Static Table">
+                <section anchor="static.table" title="静的テーブル">
                     <t>
-                        The static table consists of a predefined static list of
-                        header fields. Its entries are defined in <xref target="static.table.definition"/>.
+                        静的テーブルは予め定義されたヘッダフィールドの静的
+                        リストで構成されます。このエントリは <xref
+                            target="static.table.definition"/> で定義
+                        されます。
                     </t>
                 </section>
 
-                <section anchor="dynamic.table" title="Dynamic Table">
+                <section anchor="dynamic.table" title="動的テーブル">
                     <t>
-                        The dynamic table consists of a list of header fields
-                        maintained in first-in, first-out order.  The first and
-                        newest entry in a dynamic table is at the lowest index,
-                        and the oldest entry of a dynamic table is at the
-                        highest index.
+                        動的テーブルは first-in, first-out 順で管理される
+                        ヘッダフィールドのリストで構成されます。動的テーブルの
+                        最初であり最新のエントリは最小のインデックスに、最古の
+                        エントリは最大のインデックスになります。
                     </t>
                     <t>
-                        The dynamic table is initially empty.  Entries are added
-                        as each header block is decompressed.
+                        動的テーブルは最初は空です。各ヘッダブロックとして追加
+                        されるエントリは展開されています。
                     </t>
                     <t>
-                        The dynamic table can contain duplicate entries (i.e.,
-                        entries with the same name and same value).
-                        Therefore, duplicate entries MUST NOT be treated as an
-                        error by a decoder.
+                        動的テーブルは重複するエントリ（例えば、同じ名前と
+                        同じ値を持つエントリ）を持つことができます。
+                        従って、重複したエントリはデコーダによってエラーとして
+                        扱われてはいけません (MUST NOT) 。
                     </t>
                     <t>
                         The encoder decides how to update the dynamic table and
