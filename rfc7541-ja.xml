@@ -254,45 +254,43 @@
                         扱われてはいけません (MUST NOT) 。
                     </t>
                     <t>
-                        The encoder decides how to update the dynamic table and
-                        as such can control how much memory is used by the
-                        dynamic table. To limit the memory requirements of the
-                        decoder, the dynamic table size is strictly bounded (see
-                        <xref target="maximum.table.size"/>).
+                        エンコーダは動的テーブルの更新のしかたを決定するので、動的
+                        テーブルに使用されるメモリ量を制御することができます。
+                        デコーダのメモリ要件を制限するために、動的テーブルサイズは
+                        厳密に束縛されます (<xref target="maximum.table.size"/> を
+                        参照) 。
                     </t>
                     <t>
-                        The decoder updates the dynamic table during the
-                        processing of a list of header field representations
-                        (see <xref target="header.representation.processing"/>).
+                        ヘッダフィールド表現のリストの処理中にデコーダは動的
+                        テーブルを更新します。(<xref target="header.representation.processing"/> を参照)
                     </t>
                 </section>
 
-                <section anchor="index.address.space" title="Index Address Space">
+                <section anchor="index.address.space" title="インデックスアドレス空間">
                     <t>
-                        The static table and the dynamic table are combined into
-                        a single index address space.
+                        静的テーブルと動的テーブルは単一のインデックスアドレス
+                        空間内で結合されます。
                     </t>
                     <t>
-                        Indices between 1 and the length of the static table
-                        (inclusive) refer to elements in the static table (see
-                        <xref target="static.table"/>).
+                        1 から静的テーブルの長さの間の指定は静的テーブル内の
+                        要素を参照します (<xref target="static.table"/> を
+                        参照) 。
                     </t>
                     <t>
-                        Indices strictly greater than the length of the static
-                        table refer to elements in the dynamic table (see <xref target="dynamic.table"/>).  The length
-                        of the static table is subtracted to find the index into
-                        the dynamic table.
+                        静的テーブルの長さより大きい指定は動的テーブル (<xref target="dynamic.table"/> を参照) 内の
+                        要素を参照します。静的テーブルの長さは動的テーブルの
+                        インデックスを検索するため差し引かれます。
                     </t>
                     <t>
-                        Indices strictly greater than the sum of the lengths of
-                        both tables MUST be treated as a decoding error.
+                        両方のテーブルの長さの合計値より大きい指定はデコード
+                        エラーとして扱われなければなりません (MUST) 。
                     </t>
 
-                    <figure anchor="Index.Address.Space" title="Index Address Space">
+                    <figure anchor="Index.Address.Space" title="インデックスアドレス空間">
                         <preamble>
-                            For a static table size of s and a dynamic table
-                            size of k, the following diagram shows the entire
-                            valid index address space.
+                            静的テーブルサイズ s 、動的テーブルサイズ k として、
+                            下記の図は全体の有効なインデックスアドレス空間を
+                            示しています。
                         </preamble>
                     <artwork type="drawing"><![CDATA[
         <----------  Index Address Space ---------->
@@ -308,10 +306,10 @@
                 </section>
             </section>
 
-            <section anchor="header.representation" title="Header Field Representation">
+            <section anchor="header.representation" title="ヘッダフィールド表現">
                 <t>
-                    An encoded header field can be represented either as an
-                    index or as a literal.
+                    エンコードされたヘッダフィールドはインデックスもしくは
+                    リテラルで表現できます。
                 </t>
                 <t>
                     An indexed representation defines a header field as a
@@ -319,234 +317,219 @@
                     dynamic table (see <xref target="indexed.header.representation"/>).
                 </t>
                 <t>
-                    A literal representation defines a header field by
-                    specifying its name and value. The header field name can be
-                    represented literally or as a reference to an entry in
-                    either the static table or the dynamic table. The header
-                    field value is represented literally.
+                    リテラル表現は名前と値を指定することでヘッダフィールドを
+                    定義します。ヘッダフィールド名はリテラル、もしくは静的テーブル
+                    または動的テーブルのエントリへの参照として表現できます。
+                    ヘッダフィールド値はリテラルで表現されます。
                 </t>
                 <t>
-                    Three different literal representations are defined:
+                    3 つの異なるリテラル表現は下記のように定義されます:
                     <list style="symbols">
                         <t>
-                            A literal representation that adds the header field
-                            as a new entry at the beginning of the dynamic table
-                            (see <xref target="literal.header.with.incremental.indexing"/>).
+                            ヘッダフィールドを新しいエントリとして動的テーブルの
+                            先頭に追加するリテラル表現 (<xref target="literal.header.with.incremental.indexing"/> を参照) 。
                         </t>
                         <t>
-                            A literal representation that does not add the
-                            header field to the dynamic table (see <xref target="literal.header.without.indexing"/>).
+                            動的テーブルへのヘッダフィールドの追加を行わない
+                            リテラル表現 (<xref target="literal.header.without.indexing"/> を参照) 。
                         </t>
                         <t>
-                            A literal representation that does not add the
-                            header field to the dynamic table, with the
-                            additional stipulation that this header field always
-                            use a literal representation, in particular when
-                            re-encoded by an intermediary (see <xref target="literal.header.never.indexed"/>). This
-                            representation is intended for protecting header
-                            field values that are not to be put at risk by
-                            compressing them (see <xref target="never.indexed.literals"/> for more
-                            details).
+                            特に中継者に再エンコードされる際に、ヘッダフィールドが
+                            常にリテラル表現を使用するような追加条件を伴う、
+                            動的テーブルへのヘッダフィールドの追加を行わない
+                            リテラル表現 (<xref target="literal.header.never.indexed"/> を参照) 。
+                            この表現は圧縮によって危険にさらされないようヘッダフィールド値を
+                            保護することを意図しています。
+                            (詳細については <xref target="never.indexed.literals"/> を参照) 。
                         </t>
                     </list>
                 </t>
                 <t>
-                    The selection of one of these literal representations can be
-                    guided by security considerations, in order to protect
-                    sensitive header field values (see <xref target="compression.based.attacks"/>).
+                    3 つの表現から 1 つを選択するのは、センシティブなヘッダフィールド値を保護するため、
+                    セキュリティ情の理由から導くことができます
+                    (<xref target="compression.based.attacks"/> を参照) 。
                 </t>
                 <t>
-                    The literal representation of a header field name or of a
-                    header field value can encode the sequence of octets either
-                    directly or using a static Huffman code (see <xref target="string.literal.representation"/>).
+                    ヘッダフィールド名とヘッダフィールド値のリテラル表現は
+                    そのままのものか静的ハフマン符号 (<xref target="string.literal.representation"/> を参照)
+                    を用いたもののどちらかのオクテットの並びでエンコードできます。
                 </t>
             </section>
         </section>
 
-        <section anchor="header.block.decoding" title="Header Block Decoding">
-            <section anchor="header.block.processing" title="Header Block Processing">
+        <section anchor="header.block.decoding" title="ヘッダブロックのデコード処理">
+            <section anchor="header.block.processing" title="ヘッダブロック処理">
                 <t>
-                    A decoder processes a header block sequentially to
-                    reconstruct the original header list.
+                    デコーダはオリジナルのヘッダリストを逐次的に再構成することで
+                    ヘッダブロックを処理します。
                 </t>
                 <t>
-                    A header block is the concatenation of header field
-                    representations. The different possible header field
-                    representations are described in <xref target="detailed.format"/>.
+                    ヘッダブロックはヘッダフィールド表現を連結したものです。
+                    含められるヘッダフィールド表現の違いは <xref target="detailed.format"/> で
+                    説明します。
                 </t>
                 <t>
-                    Once a header field is decoded and added to the
-                    reconstructed header list, the header field cannot be
-                    removed. A header field added to the header list can be
-                    safely passed to the application.
+                    いったんヘッダフィールドがデコードされ再構成されたヘッダ
+                    リストに追加されたら、そのヘッダフィールドは削除することはできません。
+                    ヘッダリストに追加されたヘッダフィールドはアプリケーションに
+                    安全に渡されます。
                 </t>
                 <t>
-                    By passing the resulting header fields to the application,
-                    a decoder can be implemented with minimal transitory memory
-                    commitment in addition to the dynamic table.
+                    アプリケーションに結果のヘッダフィールドを渡すことで、
+                    デコーダは動的テーブルの他に最低限の一時的なメモリ消費で
+                    実装できます。
                 </t>
             </section>
 
-            <section anchor="header.representation.processing" title="Header Field Representation Processing">
+            <section anchor="header.representation.processing" title="ヘッダフィールド表現の処理">
                 <t>
-                    The processing of a header block to obtain a header list is
-                    defined in this section.  To ensure that the decoding will
-                    successfully produce a header list, a decoder MUST obey the
-                    following rules.
+                    ヘッダリストを得るためのヘッダブロックの処理をこの節で
+                    定義します。デコード処理でうまくヘッダリストを生成する
+                    ことを確実にするため、デコーダは下記の規則に従わなければ
+                    なりません (MUST) 。
                 </t>
                 <t>
-                    All the header field representations contained in a header
-                    block are processed in the order in which they appear, as
-                    specified below.  Details on the formatting of the various
-                    header field representations, and some additional processing
-                    instructions are found in <xref target="detailed.format"/>.
+                    ヘッダブロックに含まれるすべてのヘッダフィールド表現は
+                    下記に示す通り、現れた順に処理されます。様々なヘッダ
+                    フィールド表現のフォーマットの詳細と、追加の処理命令は
+                    <xref target="detailed.format"/> にあります。
                 </t>
                 <t>
-                    An <spanx>indexed representation</spanx> entails the
-                    following actions:
+                    <spanx>インデックス表現</spanx> は 下記のアクションを
+                    伴います:
                     <list style="symbols">
                         <t>
-                            The header field corresponding to the referenced
-                            entry in either the static table or dynamic table is
-                            appended to the decoded header list.
+                            静的テーブルもしくは動的テーブルの参照されるエントリに
+                            対応するヘッダフィールドをデコード済みヘッダリストに
+                            追加する。
                         </t>
                     </list>
                 </t>
                 <t>
-                    A <spanx>literal representation</spanx> that is <spanx>not
-                    added</spanx> to the dynamic table entails the following
+                    動的テーブルに <spanx>追加されていない</spanx> 
+                    <spanx>リテラル表現</spanx> は下記のアクションを伴います:
                     action:
                     <list style="symbols">
                         <t>
-                            The header field is appended to the decoded header
-                            list.
+                            ヘッダフィールドをデコード済みヘッダリストに
+                            追加する。
                         </t>
                     </list>
                 </t>
                 <t>
-                    A <spanx>literal representation</spanx> that is
-                    <spanx>added</spanx> to the dynamic table entails the
-                    following actions:
+                    動的テーブルに <spanx>追加されている</spanx> 
+                    <spanx>リテラル表現</spanx> は下記のアクションを伴います:
                     <list style="symbols">
                         <t>
-                            The header field is appended to the decoded header
-                            list.
+                            ヘッダフィールドをデコード済みヘッダリストに
+                            追加する。
                         </t>
                         <t>
-                            The header field is inserted at the beginning of the
-                            dynamic table. This insertion could result in the
-                            eviction of previous entries in the dynamic table
-                            (see <xref target="entry.addition"/>).
+                            ヘッダフィールドは動的テーブルの先頭に挿入されます。
+                            この挿入処理は動的テーブルの以前のエントリの削除を
+                            引き起こす可能性があります (<xref target="entry.addition"/> を参照) 。
                         </t>
                     </list>
                 </t>
             </section>
         </section>
 
-        <section anchor="dynamic.table.management" title="Dynamic Table Management">
+        <section anchor="dynamic.table.management" title="動的テーブルの管理">
             <t>
-                To limit the memory requirements on the decoder side, the
-                dynamic table is constrained in size.
+                デコーダ側のメモリ要件を制限するため、動的テーブルは
+                サイズが制限されます。
             </t>
 
-            <section anchor="calculating.table.size" title="Calculating Table Size">
+            <section anchor="calculating.table.size" title="テーブルサイズの計算">
                 <t>
-                    The size of the dynamic table is the sum of the size of its
-                    entries.
+                    動的テーブルのサイズはそのエントリのサイズの合計値です。
                 </t>
                 <t>
-                    The size of an entry is the sum of its name's length in
-                    octets (as defined in <xref target="string.literal.representation"/>), its value's
-                    length in octets, plus 32.
+                    エントリのサイズはその名前のオクテットの長さ (<xref target="string.literal.representation" /> で定義される
+                    通り) と値のオクテットの長さに 32 を加えた合計値です。
                 </t>
                 <t>
-                    The size of an entry is calculated using the length of its
-                    name and value without any Huffman encoding applied.
+                    エントリのサイズはハフマンエンコーディングの適用無しの
+                    名前と値の長さで計算されます。
                 </t>
                 <t>
                     <list style="hanging">
-                        <t hangText="Note:">
-                            The additional 32 octets account for an estimated
-                            overhead associated with an entry. For example, an
-                            entry structure using two 64-bit pointers to
-                            reference the name and the value of the entry, and
-                            two 64-bit integers for counting the number of
-                            references to the name and value would have 32
-                            octets of overhead.
+                        <t hangText="注意:">
+                            エントリに関連付くオーバーヘッドとして追加の 32 
+                            オクテットを付加します。例として、エントリの名前と値を
+                            参照するための 2 つの 64 ビットポインタと、名前と値への
+                            参照数を数える 2 つの 64 ビット整数を使うエントリ構造
+                            は 32 オクテットのオーバーヘッドを持ちます。
                         </t>
                     </list>
                 </t>
             </section>
 
-            <section anchor="maximum.table.size" title="Maximum Table Size">
+            <section anchor="maximum.table.size" title="最大テーブルサイズ">
                 <t>
-                    Protocols that use HPACK determine the maximum size that the
-                    encoder is permitted to use for the dynamic table.  In
-                    HTTP/2, this value is determined by the
-                    SETTINGS_HEADER_TABLE_SIZE setting (see Section 6.5.2 of <xref target="HTTP2"/>).
+                    HPACK を使用するプロトコルは、エンコーダが動的テーブルに
+                    使用することが許可される最大サイズを決定します。 HTTP/2 に
+                    おいて、この値は SETTINGS_HEADER_TABLE_SIZE 設定 
+                    (<xref target="HTTP2"/> の 6.5.2 節を
+                    参照) で決定されます。
                 </t>
                 <t>
-                    An encoder can choose to use less capacity than this maximum
-                    size (see <xref target="encoding.context.update"/>), but the
-                    chosen size MUST stay lower than or equal to the maximum set
-                    by the protocol.
+                    エンコーダはこの最大値より小さな容量を使用することを選択する
+                    ことが可能です (<xref target="encoding.context.update"/> を
+                    参照) が、その値はプロトコルによって設定された最大値
+                    以下に留めなければなりません (MUST) 。
                 </t>
                 <t>
-                    A change in the maximum size of the dynamic table is
-                    signaled via an encoding context update (see <xref target="encoding.context.update"/>).  This encoding context
-                    update MUST occur at the beginning of the first header block
-                    following the change to the dynamic table size.  In HTTP/2,
-                    this follows a settings acknowledgment (see Section 6.5.3 of <xref target="HTTP2"/>).
+                    動的テーブルの最大サイズの変更はエンコーディングコンテキスト更新 
+                    (<xref target="encoding.context.update"/> を参照) から通知されます。
+                    エンコーディングコンテキスト更新は動的テーブルサイズの変更に続いて、最初の
+                    ヘッダブロックの先頭で行わなければなりません (MUST) 。
+                    HTTP/2 において、これは設定同期 (<xref target="HTTP2"/> の 6.5.3 節を
+                    参照) で追従します。
                 </t>
                 <t>
-                    Multiple updates to the maximum table size can occur between
-                    the transmission of two header blocks.  In the case that this
-                    size is changed more than once in this interval, the
-                    smallest maximum table size that occurs in that interval
-                    MUST be signaled in an encoding context update.  The final
-                    maximum size is always signaled, resulting in at most two
-                    encoding context updates.  This ensures that the decoder is
-                    able to perform eviction based on reductions in dynamic
-                    table size (see <xref target="entry.eviction"/>).
+                    二つのヘッダブロックの送信の間に複数のテーブルサイズの最大値の
+                    更新が起こる可能性があります。この場合このサイズはこの区間内に
+                    一度以上変更され、区間内に現れた最小の最大テーブルサイズが
+                    エンコーディングコンテキスト更新内で通知されなければなりません (MUST) 。
+                    最終的な最大サイズは常に通知され、多くて二つのエンコーディングコンテキスト更新が
+                    引き起こされます。これはデコーダがデコーダテーブルサイズに基づき
+                    削除を実行することを可能にするのを確実にします (<xref target="entry.eviction"/> を参照) 。
                 </t>
                 <t>
-                    This mechanism can be used to completely clear entries from
-                    the dynamic table by setting a maximum size of 0, which can
-                    subsequently be restored.
-                </t>
-            </section>
-
-            <section anchor="entry.eviction" title="Entry Eviction when Dynamic Table Size Changes">
-                <t>
-                    Whenever the maximum size for the dynamic table is reduced,
-                    entries are evicted from the end of the dynamic table until
-                    the size of the dynamic table is less than or equal to the
-                    maximum size.
+                    このメカニズムで 0 の最大サイズを設定することで動的テーブル
+                    からエントリを完全にクリアして、その後に再格納することが
+                    できます。
                 </t>
             </section>
 
-            <section anchor="entry.addition" title="Entry Eviction when Adding New Entries">
+            <section anchor="entry.eviction" title="動的テーブルサイズ変更時のエントリの削除">
                 <t>
-                    Before a new entry is added to the dynamic table, entries
-                    are evicted from the end of the dynamic table until the size
-                    of the dynamic table is less than or equal to (maximum size
-                    - new entry size), or until the table is empty.
+                    動的テーブルの最大サイズが減少するたびに、動的テーブルの
+                    サイズが最大サイズ以下になるまで動的テーブルの末尾から
+                    エントリが削除されます。
+                </t>
+            </section>
+
+            <section anchor="entry.addition" title="新しいエントリ追加時のエントリの削除">
+                <t>
+                    動的テーブルに新しいエントリが追加される前に、
+                    動的テーブルのサイズが (最大サイズ - 新しいエントリサイズ) 
+                    以下になるかテーブルが空になるまで動的テーブルの末尾から
+                    エントリが削除されます。
                 </t>
                 <t>
-                    If the size of the new entry is less than or equal to the
-                    maximum size, that entry is added to the table.  It is not
-                    an error to attempt to add an entry that is larger than the
-                    maximum size; an attempt to add an entry larger than the
-                    maximum size causes the table to be emptied of all existing
-                    entries, and results in an empty table.
+                    もし新しいエントリのサイズが最大サイズ以下なら、エントリは
+                    テーブルに追加されます。最大サイズより大きいエントリの
+                    追加を試みることはエラーにはなりません; 最大サイズより
+                    大きなエントリの追加を試みるとすべてのエントリを空にすることに
+                    なり、テーブルを空にする結果になります。
                 </t>
                 <t>
-                    A new entry can reference the name of an entry in the
-                    dynamic table that will be evicted when adding this new
-                    entry into the dynamic table. Implementations are cautioned
-                    to avoid deleting the referenced name if the referenced
-                    entry is evicted from the dynamic table prior to inserting
-                    the new entry.
+                    動的テーブルに新しいエントリを追加する際、そのエントリは
+                    削除される可能性のある動的テーブルのエントリの名前を参照する可能性があります。
+                    新しいエントリを挿入する前に動的テーブルから参照されるエントリが
+                    削除される場合、参照される名前を削除するのを避けるよう実装に注意してください。
                 </t>
             </section>
         </section>
