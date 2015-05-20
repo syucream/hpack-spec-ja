@@ -574,7 +574,7 @@
                     残りのオクテットのビットは残った値をエンコードするのに
                     使用されます。
                 </t>
-                <figure anchor="Integer.Value.Encoded.after.the.Prefix.shown.for.N.5" title="Integer Value Encoded after the Prefix (shown for N = 5)">
+                <figure anchor="Integer.Value.Encoded.after.the.Prefix.shown.for.N.5" title="プレフィックスの後ろのエンコードされた整数値 (N = 5 の場合)">
                     <artwork type="inline"><![CDATA[
   0   1   2   3   4   5   6   7
 +---+---+---+---+---+---+---+---+
