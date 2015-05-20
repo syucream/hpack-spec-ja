@@ -534,33 +534,30 @@
             </section>
         </section>
 
-        <section anchor="low-level.representation" title="Primitive Type Representations">
+        <section anchor="low-level.representation" title="プリミティブ型表現">
             <t>
-                HPACK encoding uses two primitive types: unsigned variable
-                length integers, and strings of octets.
+                HPACK エンコーディングは二つのプリミティブ型を使用します:
+                符号なしの可変長整数と、オクテットの文字列
             </t>
 
-            <section anchor="integer.representation" title="Integer Representation">
+            <section anchor="integer.representation" title="整数表現">
                 <t>
-                    Integers are used to represent name indexes, header field
-                    indexes or string lengths. An integer representation can
-                    start anywhere within an octet. To allow for optimized
-                    processing, an integer representation always finishes at the
-                    end of an octet.
+                    整数は名前のインデックス、ヘッダフィールドのインデックスまたは
+                    文字列の長さを表現するために使用されます。整数表現はオクテット内の
+                    どこからでも開始できます。処理の最適化のため、整数表現は常に
+                    オクテットの末尾で終わります。
                 </t>
                 <t>
-                    An integer is represented in two parts: a prefix that fills
-                    the current octet and an optional list of octets that are
-                    used if the integer value does not fit within the prefix.
-                    The number of bits of the prefix (called N) is a parameter
-                    of the integer representation.
+                    整数は 2 つのパートで表現されます: 現在のオクテットを埋める
+                    プレフィックスとプレフィックス内に収まらない整数値のため
+                    使用されるオクテットのオプションのリスト。プレフィックス
+                    のビット数 (N と呼ばれる) はこの整数表現のパラメータです。
                 </t>
                 <t>
-                    If the integer value is small enough, i.e., strictly less
-                    than 2^N-1, it is encoded within the N-bit
-                    prefix.
+                    整数値が十分小さい、すなわち 2^N-1 未満の
+                    場合、 N ビットプレフィックス内にエンコードされます。
                 </t>
-                <figure anchor="Integer.Value.Encoded.within.the.Prefix.shown.for.N.5" title="Integer Value Encoded within the Prefix (shown for N = 5)">
+                <figure anchor="Integer.Value.Encoded.within.the.Prefix.shown.for.N.5" title="プレフィックス内のエンコードされた整数値 (N = 5 の場合)">
                     <artwork type="inline"><![CDATA[
   0   1   2   3   4   5   6   7
 +---+---+---+---+---+---+---+---+
@@ -569,12 +566,13 @@
 ]]></artwork>
                 </figure>
                 <t>
-                    Otherwise, all the bits of the prefix are set to 1 and the
-                    value, decreased by 2^N-1, is encoded using a
-                    list of one or more octets. The most significant bit of each
-                    octet is used as a continuation flag: its value is set to 1
-                    except for the last octet in the list. The remaining bits of
-                    the octets are used to encode the decreased value.
+                    そうでない場合、プレフィックスの全てのビットが 1
+                    ならその値は 2^N-1 分減らされ、一個以上の
+                    オクテットのリストを使用してエンコードされます。
+                    各オクテットの最上位ビットは継続フラグとして使用されます:
+                    リストの最終オクテットを除きこの値には 1 がセットされます。
+                    残りのオクテットのビットは残った値をエンコードするのに
+                    使用されます。
                 </t>
                 <figure anchor="Integer.Value.Encoded.after.the.Prefix.shown.for.N.5" title="Integer Value Encoded after the Prefix (shown for N = 5)">
                     <artwork type="inline"><![CDATA[
@@ -591,21 +589,20 @@
 ]]></artwork>
                 </figure>
                 <t>
-                    Decoding the integer value from the list of octets starts by
-                    reversing the order of the octets in the list. Then, for
-                    each octet, its most significant bit is removed. The
-                    remaining bits of the octets are concatenated and the
-                    resulting value is increased by 2^N-1 to
-                    obtain the integer value.
+                    オクテットのリストからの整数値のデコード処理はリストの
+                    オクテットの逆順から開始します。その後、オクテット毎に
+                    最上位ビットを除去します。オクテットの残りのビットは
+                    連結され、その結果の値は整数値を得るために
+                    2^N-1 分加算されます。
                 </t>
                 <t>
-                    The prefix size, N, is always between 1 and 8 bits. An
-                    integer starting at an octet-boundary will have an 8-bit
-                    prefix.
+                    プレフィックスサイズ N は常に 1 から 8 ビットの間です。
+                    オクテット境界から開始する整数は 8 ビットプレフィックスを
+                    持ちます。
                 </t>
                 <figure>
                     <preamble>
-                        Pseudo-code to represent an integer I is as follows:
+                        整数 I を表現する擬似コードは下記の通り:
                     </preamble>
                     <artwork type="inline"><![CDATA[
 if I < 2^N - 1, encode I on N bits
@@ -620,7 +617,7 @@ else
                 </figure>
                 <figure>
                     <preamble>
-                        Pseudo-code to decode an integer I is as follows:
+                        整数 I をデコードする擬似コードは下記の通り:
                     </preamble>
                     <artwork type="inline"><![CDATA[
 decode I from the next N bits
@@ -636,30 +633,29 @@ else
 ]]></artwork>
                 </figure>
                 <t>
-                    Examples illustrating the encoding of integers are available
-                    in <xref target="integer.representation.examples"/>.
+                    整数のエンコード処理を解説する例は
+                    <xref target="integer.representation.examples"/> にあります。
                 </t>
                 <t>
-                    This integer representation allows for values of indefinite
-                    size.  It is also possible for an encoder to send a large
-                    number of zero values, which can waste octets and could be
-                    used to overflow integer values.  Integer encodings that
-                    exceed an implementation limits - in value or octet length -
-                    MUST be treated as a decoding error.  Different limits can
-                    be set for each of the different uses of integers, based on
-                    implementation constraints.
+                    この整数表現は不定サイズの値が許可されます。エンコーダは
+                    ゼロ値の巨大な数値を送ることも可能ですが、オクテットを浪費して
+                    整数値のオーバーフローを起こす可能性があります。
+                    値やオクテットの長さでの過度に巨大な整数のエンコードは
+                    デコードエラーとして扱われなければなりません (MUST) 。
+                    制限の差異は実装上の制限に基づいて、各々の整数の使用方法の違いに
+                    合わせることができます。
                 </t>
             </section>
 
-            <section anchor="string.literal.representation" title="String Literal Representation">
+            <section anchor="string.literal.representation" title="文字列リテラル表現">
                 <t>
-                    Header field names and header field values can be
-                    represented as literal strings. A literal string is encoded
-                    as a sequence of octets, either by directly encoding the
-                    literal string's octets, or by using a Huffman code
-                    (see <xref target="HUFFMAN"/>).
+                    ヘッダフィールド名とヘッダフィールド値はリテラル文字列で
+                    表現できます。リテラル文字列は文字列リテラルの
+                    オクテットに直接、もしくはハフマン符号
+                    (<xref target="HUFFMAN"/> を参照) を
+                    使用することでオクテットの連続としてエンコードされます。
                 </t>
-                <figure anchor="String.Literal.Representation" title="String Literal Representation">
+                <figure anchor="String.Literal.Representation" title="文字列リテラル表現">
                     <artwork type="inline"><![CDATA[
   0   1   2   3   4   5   6   7
 +---+---+---+---+---+---+---+---+
@@ -670,75 +666,73 @@ else
 ]]></artwork>
                 </figure>
                 <t>
-                    A literal string representation contains the following
-                    fields:
+                    リテラル文字列表現は下記のフィールドを含みます:
                     <list style="hanging">
                         <t hangText="H:">
-                            A one bit flag, H, indicating whether or not the
-                            octets of the string are Huffman encoded.
+                            1 ビットフラグ H 。文字列のオクテットがハフマン
+                            エンコーディングされているかどうかを示します。
                         </t>
                         <t hangText="String Length:">
-                            The number of octets used to encode the string
-                            literal, encoded as an integer with 7-bit prefix
-                            (see <xref target="integer.representation"/>).
+                            文字列リテラルをエンコードするのに使用された
+                            オクテットの数。 7 ビットプレフィックスの
+                            整数としてエンコードされます。(<xref target="integer.representation"/> を参照)
                         </t>
                         <t hangText="String Data:">
-                            The encoded data of the string literal. If H is
-                            '0', then the encoded data is the raw octets of
-                            the string literal. If H is '1', then the
-                            encoded data is the Huffman encoding of the
-                            string literal.
+                            文字列リテラルのエンコードされたデータ。
+                            もし H が '0' なら、エンコードされたデータは
+                            文字列リテラルの生のオクテットです。もし H が 
+                            '1' なら、エンコードされたデータは文字列リテラルを
+                            ハフマンエンコーディングされています。
                         </t>
                     </list>
                 </t>
                 <t>
-                    String literals which use Huffman encoding are encoded with
-                    the Huffman code defined in <xref target="huffman.code"/>
-                    (see examples for requests in <xref target="request.examples.with.huffman.coding"/> and for
-                    responses in <xref target="response.examples.with.huffman.coding"/>). The
-                    encoded data is the bitwise concatenation of the codes
-                    corresponding to each octet of the string literal.
+                    ハフマンエンコーディングを使用する文字列リテラルは
+                    <xref target="huffman.code"/> で定義されるハフマン符号で
+                    エンコードされます。(リクエストの例として <xref target="request.examples.with.huffman.coding"/> を、
+                    レスポンスの例として <xref target="response.examples.with.huffman.coding"/> を
+                    参照) エンコードされたデータは文字列リテラルの各
+                    オクテットに対応する符号のビット列です。
                 </t>
                 <t>
-                    As the Huffman encoded data doesn't always end at an octet
-                    boundary, some padding is inserted after it, up to the next
-                    octet boundary. To prevent this padding to be misinterpreted
-                    as part of the string literal, the most significant bits of
-                    the code corresponding to the EOS (end-of-string) symbol are
-                    used.
+                    ハフマンエンコードされたデータは常にオクテット境界で終わる
+                    わけではないので、その後に次のオクテット境界までパディングが
+                    挿入されます。このパディングが文字列リテラルの一部だと誤認
+                    されることを防ぐため、符号の最上位ビットに EOS
+                    (end-of-string) に対応するシンボルが使用されます。
                 </t>
                 <t>
-                    Upon decoding, an incomplete code at the end of the
-                    encoded data is to be considered as padding and discarded. A
-                    padding strictly longer than 7 bits MUST be treated as a
-                    decoding error. A padding not corresponding to the most
-                    significant bits of the code for the EOS symbol MUST be
-                    treated as a decoding error. A Huffman encoded string
-                    literal containing the EOS symbol MUST be treated as a
-                    decoding error.
+                    デコーディングにおいて、エンコードされたデータの最後の
+                    不完全なコードはパディングだとみなされ、破棄されます。
+                    7 ビットより大きいパディングはデコードエラーとして
+                    扱われなければなりません (MUST) 。 EOS シンボルのコードの
+                    最上位ビットに対応しないパディングはデコードエラーとして
+                    扱われなければなりません (MUST) 。 EOS シンボルを含む
+                    ハフマンエンコードされた文字列リテラルはデコードエラーとして
+                    扱われなければなりません (MUST) 。
                 </t>
             </section>
         </section>
 
-        <section anchor="detailed.format" title="Binary Format">
+        <section anchor="detailed.format" title="バイナリフォーマット">
             <t>
-                This section describes the detailed format of each of the
-                different header field representations, plus the encoding
-                context update instruction.
+                この節では様々なヘッダフィールド表現の詳細フォーマット
+                と、加えてエンコーディングコンテキストの更新命令について
+                記述します。
             </t>
 
-            <section anchor="indexed.header.representation" title="Indexed Header Field Representation">
+            <section anchor="indexed.header.representation" title="インデックスヘッダフィールド表現">
                 <t>
-                    An indexed header field representation identifies an entry
-                    in either the static table or the dynamic table (see <xref target="indexing.tables"/>).
+                    インデックスヘッダフィールド表現は静的テーブル
+                    または動的テーブルのエントリを識別します。(<xref target="indexing.tables"/> を参照)
                 </t>
                 <t>
-                    An indexed header field representation causes a
-                    header field to be added to the decoded header list, as
-                    described in <xref target="header.representation.processing"/>.
+                    インデックスヘッダフィールド表現は <xref target="header.representation.processing"/> で
+                    記述した通り、デコードされたヘッダリストへのヘッダ
+                    フィールドの追加を発生させます。
                 </t>
 
-                <figure anchor="Indexed.Header.Field" title="Indexed Header Field">
+                <figure anchor="Indexed.Header.Field" title="インデックスヘッダフィールド">
                     <artwork type="inline"><![CDATA[
   0   1   2   3   4   5   6   7
 +---+---+---+---+---+---+---+---+
@@ -747,39 +741,40 @@ else
 ]]></artwork>
                 </figure>
                 <t>
-                    An indexed header field starts with the '1' 1-bit pattern,
-                    followed by the index of the matching header field,
-                    represented as an integer with a 7-bit prefix (see <xref target="integer.representation"/>).
+                    インデックスヘッダフィールドは 1 ビットパターン '1'
+                    から開始し、マッチするヘッダフィールドのインデックスが後に続きます。
+                    インデックスは 7 ビットプレフィックスの整数として表現
+                    されます (<xref target="integer.representation"/> を
+                    参照) 。
                 </t>
                 <t>
-                    The index value of 0 is not used. It MUST be treated as a
-                    decoding error if found in an indexed header field
-                    representation.
+                    0 のインデックス値は使用されません。もしインデックスヘッダ
+                    フィールド表現でこれが見つかった場合、デコードエラーとして
+                    扱われなければなりません (MUST) 。
                 </t>
             </section>
 
-            <section anchor="literal.header.representation" title="Literal Header Field Representation">
+            <section anchor="literal.header.representation" title="リテラルヘッダフィールド表現">
                 <t>
-                    A literal header field representation contains a literal
-                    header field value.  Header field names are either provided
-                    as a literal or by reference to an existing table entry,
-                    either from the static table or the dynamic table (see <xref target="indexing.tables"/>).
+                    リテラルヘッダフィールド表現はリテラルヘッダフィールド値を
+                    含みます。ヘッダフィールド名はリテラル、もしくは静的テーブル
+                    か動的テーブルに存在するテーブルエントリへの参照として
+                    与えられます。 (<xref target="indexing.tables"/> を参照)
                 </t>
 
                 <t>
-                  This specification defines three forms of literal header
-                  field representations; with indexing, without indexing,
-                  and never indexed.
+                    この仕様ではリテラルヘッダフィールド表現の 3 つの形式、
+                    インデックスを伴う、インデックスを伴わない、インデックスしない
+                    ものを定義します。
                 </t>
 
-                <section anchor="literal.header.with.incremental.indexing" title="Literal Header Field with Incremental Indexing">
+                <section anchor="literal.header.with.incremental.indexing" title="インデックス更新を伴うリテラルヘッダフィールド">
                     <t>
-                        A literal header field with incremental indexing
-                        representation results in appending a header field to
-                        the decoded header list and inserting it as a new entry
-                        into the dynamic table.
+                        インデックス更新を伴うリテラルヘッダフィールド表現は
+                        デコードされたヘッダリストへのヘッダフィールドの追加と
+                        動的テーブルへの新しいエントリの挿入を発生させます。
                     </t>
-                    <figure anchor="Literal.Header.Field.with.Incremental.Indexing.Indexed.Name" title="Literal Header Field with Incremental Indexing - Indexed Name">
+                    <figure anchor="Literal.Header.Field.with.Incremental.Indexing.Indexed.Name" title="インデックス更新を伴うリテラルヘッダフィールド - インデックスされた名前">
                         <artwork type="inline"><![CDATA[
   0   1   2   3   4   5   6   7
 +---+---+---+---+---+---+---+---+
@@ -791,7 +786,7 @@ else
 +-------------------------------+
 ]]></artwork>
                     </figure>
-                    <figure anchor="Literal.Header.Field.with.Incremental.Indexing.New.Name" title="Literal Header Field with Incremental Indexing - New Name">
+                    <figure anchor="Literal.Header.Field.with.Incremental.Indexing.New.Name" title="インデックス更新を伴うリテラルヘッダフィールド - 新しい名前">
                         <artwork type="inline"><![CDATA[
   0   1   2   3   4   5   6   7
 +---+---+---+---+---+---+---+---+
@@ -808,38 +803,36 @@ else
 ]]></artwork>
                     </figure>
                     <t>
-                        A literal header field with incremental indexing
-                        representation starts with the '01' 2-bit pattern.
+                        インデックス更新を伴うリテラルヘッダフィールド表現は
+                        2 ビットパターン '01' から開始します。
                     </t>
                     <t>
-                        If the header field name matches the header field name
-                        of an entry stored in the static table or the dynamic
-                        table, the header field name can be represented using
-                        the index of that entry. In this case, the index of the
-                        entry is represented as an integer with a 6-bit prefix
-                        (see <xref target="integer.representation"/>).  This
-                        value is always non-zero.
+                        もし静的テーブルまたは動的テーブルに格納されたエントリの
+                        ヘッダフィールド名に、ヘッダフィールド名とマッチする場合、
+                        ヘッダフィールド名はそのエントリのインデックスを用いて
+                        表現できます。この場合、エントリのインデックスは 6 ビット
+                        プレフィックスの整数値として表現されます。 (<xref target="integer.representation"/> を参照)
+                        この値は常に非ゼロです。
                     </t>
                     <t>
-                        Otherwise, the header field name is represented as a
-                        literal string (see <xref target="string.literal.representation"/>). A value
-                        0 is used in place of the 6-bit index, followed by the
-                        header field name.
+                        そうでなければ、ヘッダフィールド名が文字列リテラル (<xref target="string.literal.representation" /> を
+                        参照) として表現されます。 6 ビットインデックスの
+                        代わりに 0 値が使用され、ヘッダフィールド名が続きます。
                     </t>
                     <t>
-                        Either form of header field name representation is
-                        followed by the header field value represented as a
-                        literal string (see <xref target="string.literal.representation"/>).
+                        どちらのヘッダフィールド名表現の形式も、文字列リテラル
+                        (<xref target="string.literal.representation" /> を
+                        参照) として表現されたヘッダフィールド値が続きます。
                     </t>
                 </section>
 
-                <section anchor="literal.header.without.indexing" title="Literal Header Field without Indexing">
+                <section anchor="literal.header.without.indexing" title="インデックス更新を伴わないリテラルヘッダフィールド">
                     <t>
-                        A literal header field without indexing representation
-                        results in appending a header field to the decoded
-                        header list without altering the dynamic table.
+                        インデックス更新を伴わないリテラルヘッダフィールド表現は、
+                        動的テーブルの変更を伴わずにデコードされたヘッダリストへの
+                        ヘッダフィールドの追加を引き起こします。
                     </t>
-                    <figure anchor="Literal.Header.Field.without.Indexing.Indexed.Name" title="Literal Header Field without Indexing - Indexed Name">
+                    <figure anchor="Literal.Header.Field.without.Indexing.Indexed.Name" title="インデックス更新を伴わないリテラルヘッダフィールド - インデックスされた名前">
                         <artwork type="inline"><![CDATA[
   0   1   2   3   4   5   6   7
 +---+---+---+---+---+---+---+---+
@@ -851,7 +844,7 @@ else
 +-------------------------------+
 ]]></artwork>
                     </figure>
-                    <figure anchor="Literal.Header.Field.without.Indexing.New.Name" title="Literal Header Field without Indexing - New Name">
+                    <figure anchor="Literal.Header.Field.without.Indexing.New.Name" title="インデックス更新を伴わないリテラルヘッダフィールド - 新しい名前">
                         <artwork type="inline"><![CDATA[
   0   1   2   3   4   5   6   7
 +---+---+---+---+---+---+---+---+
@@ -868,40 +861,38 @@ else
 ]]></artwork>
                     </figure>
                     <t>
-                        A literal header field without indexing representation
-                        starts with the '0000' 4-bit pattern.
+                        インデックス更新を伴わないリテラルヘッダフィールド表現は
+                        4 ビットパターン '0000' から開始します。
                     </t>
                     <t>
-                        If the header field name matches the header field name
-                        of an entry stored in the static table or the dynamic
-                        table, the header field name can be represented using
-                        the index of that entry. In this case, the index of the
-                        entry is represented as an integer with a 4-bit prefix
-                        (see <xref target="integer.representation"/>).  This
-                        value is always non-zero.
+                        もし静的テーブルまたは動的テーブルに格納されたエントリの
+                        ヘッダフィールド名に、ヘッダフィールド名とマッチする場合、
+                        ヘッダフィールド名はそのエントリのインデックスを用いて
+                        表現できます。この場合、エントリのインデックスは 4 ビット
+                        プレフィックスの整数値として表現されます。 (<xref target="integer.representation"/> を参照)
+                        この値は常に非ゼロです。
                     </t>
                     <t>
-                        Otherwise, the header field name is represented as a
-                        literal string (see <xref target="string.literal.representation"/>). A value
-                        0 is used in place of the 4-bit index, followed by the
-                        header field name.
+                        そうでなければ、ヘッダフィールド名が文字列リテラル (<xref target="string.literal.representation" /> を
+                        参照) として表現されます。 4 ビットインデックスの
+                        代わりに 0 値が使用され、ヘッダフィールド名が続きます。
                     </t>
                     <t>
-                        Either form of header field name representation is
-                        followed by the header field value represented as a
-                        literal string (see <xref target="string.literal.representation"/>).
+                        どちらのヘッダフィールド名表現の形式も、文字列リテラル
+                        (<xref target="string.literal.representation" /> を
+                        参照) として表現されたヘッダフィールド値が続きます。
                     </t>
                 </section>
 
-                <section anchor="literal.header.never.indexed" title="Literal Header Field never Indexed">
+                <section anchor="literal.header.never.indexed" title="インデックスされないリテラルヘッダフィールド">
                     <t>
-                        A literal header field never indexed representation
-                        results in appending a header field to the decoded
-                        header list without altering the dynamic table.
-                        Intermediaries MUST use the same representation for
-                        encoding this header field.
+                        インデックスされないリテラルヘッダフィールド表現は
+                        動的テーブルの変更を伴わずにデコードされたヘッダリストへの
+                        ヘッダフィールドの追加を引き起こします。
+                        中継者はこのヘッダフィールドのエンコードに同じ表現を
+                        使用しなければなりません (MUST) 。
                     </t>
-                    <figure anchor="Literal.Header.Field.never.Indexed.Indexed.Name" title="Literal Header Field never Indexed - Indexed Name">
+                    <figure anchor="Literal.Header.Field.never.Indexed.Indexed.Name" title="インデックスされないリテラルヘッダフィールド - インデックスされた名前">
                         <artwork type="inline"><![CDATA[
   0   1   2   3   4   5   6   7
 +---+---+---+---+---+---+---+---+
@@ -913,7 +904,7 @@ else
 +-------------------------------+
 ]]></artwork>
                     </figure>
-                    <figure anchor="Literal.Header.Field.never.Indexed.New.Name" title="Literal Header Field never Indexed - New Name">
+                    <figure anchor="Literal.Header.Field.never.Indexed.New.Name" title="インデックスされないリテラルヘッダフィールド - 新しい名前">
                         <artwork type="inline"><![CDATA[
   0   1   2   3   4   5   6   7
 +---+---+---+---+---+---+---+---+
@@ -930,37 +921,38 @@ else
 ]]></artwork>
                     </figure>
                     <t>
-                        A literal header field never indexed representation
-                        starts with the '0001' 4-bit pattern.
+                        インデックスされないリテラルヘッダフィールド表現は
+                        4 ビットパターン '0001' から開始します。
                     </t>
                     <t>
-                        When a header field is represented as a literal header
-                        field never indexed, it MUST always be encoded with
-                        this specific literal representation. In particular,
-                        when a peer sends a header field that it received
-                        represented as a literal header field never indexed, it
-                        MUST use the same representation to forward this header
-                        field.
+                        ヘッダフィールドがインデックスされないリテラルヘッダ
+                        フィールドとして表現される際、常にこのリテラル表現で
+                        エンコードされなければなりません (MUST) 。特に、
+                        ピアがインデックスされないリテラルヘッダフィールド
+                        として表現されたヘッダフィールドを受け取ってそれを
+                        送信する際、そのヘッダフィールドを転送するのに同じ
+                        表現を使用しなければなりません (MUST) 。
                     </t>
                     <t>
-                        This representation is intended for protecting header
-                        field values that are not to be put at risk by
-                        compressing them (see <xref target="compression.based.attacks"/> for more details).
+                        この表現は圧縮によるリスクに晒されないよう
+                        ヘッダフィールド値を保護することを意図しています
+                        (詳細は <xref target="compression.based.attacks"/> を
+                        参照) 。
                     </t>
                     <t>
-                        The encoding of the representation is identical to the
-                        literal header field without indexing
-                        (see <xref target="literal.header.without.indexing"/>).
+                        この表現のエンコーディングはインデクシングを伴わない
+                        リテラルヘッダフィールドと同様です (<xref target="literal.header.without.indexing"/> を
+                        参照) 。
                     </t>
                 </section>
             </section>
 
-            <section anchor="encoding.context.update" title="Dynamic Table Size Update">
+            <section anchor="encoding.context.update" title="動的テーブルサイズ更新">
                 <t>
-                    A dynamic table size update signals a change to the size of
-                    the dynamic table.
+                    動的テーブルサイズ更新は動的テーブルのサイズの変更を
+                    通知します。
                 </t>
-                <figure anchor="Maximum.Dynamic.Table.Size.Change" title="Maximum Dynamic Table Size Change">
+                <figure anchor="Maximum.Dynamic.Table.Size.Change" title="最大動的テーブルサイズの変更">
                     <artwork type="inline"><![CDATA[
   0   1   2   3   4   5   6   7
 +---+---+---+---+---+---+---+---+
@@ -969,213 +961,206 @@ else
 ]]></artwork>
                 </figure>
                 <t>
-                    A dynamic table size update starts with the '001' 3-bit
-                    pattern, followed by the new maximum size, represented as an
-                    integer with a 5-bit prefix (see <xref target="integer.representation"/>).
+                    動的テーブルサイズ更新は 3 ビットパターン '001' から開始し、
+                    5 ビットプレフィックスの整数値 (<xref target="integer.representation"/> を参照) として
+                    表現される新しい最大値が続きます。
                 </t>
                 <t>
-                    The new maximum size MUST be lower than or equal to the
-                    limit determined by the protocol using HPACK. A value that
-                    exceeds this limit MUST be treated as a decoding error. In
-                    HTTP/2, this limit is the last value of the
-                    SETTINGS_HEADER_TABLE_SIZE parameter (see Section 6.5.2 of <xref target="HTTP2"/>)
-                    received from the decoder and acknowledged by the encoder
-                    (see Section 6.5.3 of <xref target="HTTP2"/>).
+                    新しい最大値は HPACK を使用するプロトコルによって決められた
+                    上限値以下でなければなりません (MUST) 。
+                    この上限を超過した値はデコードエラーとして扱われなければ
+                    なりません (MUST) 。 HTTP/2 において、この上限は 
+                    デコーダが受け取りエンコーダが知らせた (<xref target="HTTP2"/> の 
+                    6.5.3 節を参照) SETTINGS_HEADER_TABLE_SIZE パラメータ (<xref target="HTTP2"/> の 
+                    6.5.2 節を参照) の最後の値です。
                 </t>
                 <t>
-                    Reducing the maximum size of the dynamic table can cause
-                    entries to be evicted (see <xref target="entry.eviction"/>).
+                    動的テーブルの最大サイズの減少はエントリの削除を引き起こす
+                    可能性があります。 (<xref target="entry.eviction"/> を
+                    参照) 。
                 </t>
             </section>
         </section>
 
-        <section anchor="Security" title="Security Considerations">
+        <section anchor="Security" title="セキュリティへの配慮">
 
             <t>
-                This section describes potential areas of security concern
-                with HPACK:
+                この節では HPACK の潜在的なセキュリティへの懸念部分について
+                記述します。
                 <list style="symbols">
                     <t>
-                        Use of compression as a length-based oracle for
-                        verifying guesses about secrets that are compressed
-                        into a shared compression context.
+                        共有される圧縮コンテキストに混合される秘密情報についての推測の
+                        検証のための長さを元にしたオラクルとしての圧縮の使用。
                     </t>
                     <t>
-                        Denial of service resulting from exhausting processing
-                        or memory capacity at a decoder.
+                        デコーダで処理やメモリ容量を消費することで引き起こされる
+                        サービス妨害。
                     </t>
                 </list>
             </t>
 
-            <section anchor="compression.based.attacks" title="Probing Dynamic Table State">
+            <section anchor="compression.based.attacks" title="厳密な動的テーブルの状態"
+                >
 
                 <t>
-                    HPACK reduces the length of header field encodings by
-                    exploiting the redundancy inherent in protocols like HTTP.
-                    The ultimate goal of this is to reduce the amount of data
-                    that is required to send HTTP requests or responses.
+                    HPACK は HTTP のようなプロトコルで固有な冗長性を活用する
+                    ことによってエンコーディングをされたヘッダフィールドの長さを
+                    減らします。この究極的なゴールは HTTP リクエストや
+                    レスポンスを送るために求められるデータの量を減らすことです。
                 </t>
                 <t>
-                    The compression context used to encode header fields can be
-                    probed by an attacker who can both define header fields to
-                    be encoded and transmitted and observe the length of those
-                    fields once they are encoded. When an attacker can do both,
-                    they can adaptively modify requests in order to confirm
-                    guesses about the dynamic table state. If a guess is
-                    compressed into a shorter length, the attacker can observe
-                    the encoded length and infer that the guess was correct.
+                    ヘッダフィールドをエンコードするのに使用される圧縮
+                    コンテキストは、エンコードし送信されるヘッダフィールドを
+                    定義でき、一度エンコードされるフィールドの長さを
+                    観測できる攻撃者によって探り当てられる可能性があります。
+                    攻撃者がどちらも行える際、動的テーブルの状態に関する推測を
+                    確認するためにリクエストをうまく修正することが可能です。
+                    もし推測した値が短い長さに圧縮されるなら、攻撃者はエンコードされた
+                    長さと推測した値が正しいという推量を確認できます。
                 </t>
                 <t>
-                    This is possible even over the Transport Layer Security
-                    Protocol (TLS, see <xref target="TLS12"/>), because while
-                    TLS provides confidentiality protection for content, it only
-                    provides a limited amount of protection for the length of
-                    that content.
+                    これは トランスポートレイヤセキュリティプロトコル (TLS、 
+                    <xref target="TLS12"/> を参照) を用いても起こる可能性があります。なぜなら
+                    TLS がコンテンツの秘密保護を提供していても、そのコンテンツの
+                    長さに関しては限られた保護のみしか提供されないためです。
                     <list style="hanging">
-                        <t hangText="Note:">
-                            Padding schemes only provide limited protection
-                            against an attacker with these capabilities,
-                            potentially only forcing an increased number of
-                            guesses to learn the length associated with a given
-                            guess.  Padding schemes also work directly against
-                            compression by increasing the number of bits that
-                            are transmitted.
+                        <t hangText="注意:">
+                            パティングスキームは推測の増加数を与えらた推測に
+                            関連した長さを学習することのみ強制する可能性が
+                            あるような、これらの能力を持つ攻撃者に対する限られた
+                            保護のみ提供します。
+                            パディングスキームは送信されたビット数を増加することに
+                            よって圧縮に対しても直接作用します。
                         </t>
                     </list>
                 </t>
                 <t>
-                    Attacks like <xref target="CRIME">CRIME</xref> demonstrated
-                    the existence of these general attacker capabilities.  The
-                    specific attack exploited the fact that <xref target="DEFLATE">DEFLATE</xref> removes redundancy based
-                    on prefix matching.  This permitted the attacker to confirm
-                    guesses a character at a time, reducing an exponential-time
-                    attack into a linear-time attack.
+                    <xref target="CRIME">CRIME</xref>  のような攻撃はこれらの
+                    一般的な攻撃者の能力の存在を証明しています。
+                    <xref target="DEFLATE">DEFLATE</xref> の事実を悪用するこの
+                    攻撃はプレフィックスマッチングに基づき冗長性を減らし
+                    ます。これは同時に攻撃者に文字の推測を検証する
+                    ことを許してしまい、指数関数時間の攻撃から線形時間の攻撃に
+                    してしまいます。
                 </t>
 
-                <section title="Applicability to HPACK and HTTP">
+                <section title="HPACK と HTTP への適応性">
                     <t>
-                        HPACK mitigates but does not completely prevent attacks
-                        modeled on <xref target="CRIME">CRIME</xref> by forcing
-                        a guess to match an entire header field value, rather
-                        than individual characters.  An attacker can only learn
-                        whether a guess is correct or not, so is reduced to a
-                        brute force guess for the header field values.
+                        HPACK は緩和はしますが全体のヘッダフィールド値ではなく
+                        個々の文字をマッチさせることを推測値に強制することによる
+                        <xref target="CRIME">CRIME</xref> に則った攻撃の完全な
+                        防御はしません。攻撃者は推測値が正しいか否かのみを学習する
+                        ことができるため、ヘッダフィールド値の総当たり推測に
+                        成り下がります。
                     </t>
                     <t>
-                        The viability of recovering specific header field values
-                        therefore depends on the entropy of values.  As a
-                        result, values with high entropy are unlikely to be
-                        recovered successfully.  However, values with low
-                        entropy remain vulnerable.
+                        特定のヘッダフィールド値の復元の可能性は、従って値の
+                        エントロピーに依存します。結果として、高エントロピーの
+                        値はうまく復元される可能性は低くなります。しかしながら
+                        低エントロピーの値は弱さが残ります。
                     </t>
                     <t>
-                        Attacks of this nature are possible any time that two
-                        mutually distrustful entities control requests or
-                        responses that are placed onto a single HTTP/2
-                        connection.  If the shared HPACK compressor permits one
-                        entity to add entries to the dynamic table, and the
-                        other to access those entries, then the state of the
-                        table can be learned.
+                        この性質の攻撃は一つの HTTP/2 コネクション上で行われる
+                        二つの互いに信用できないエンティティ制御リクエストと
+                        レスポンスの任意のタイミングで行えます。 もし共有の
+                        HPACK 実装が一つのエンティティに動的テーブルへの
+                        エントリの追加を許可し、他者がそのエントリにアクセス
+                        するなら、テーブルの状態を学習できます。
                     </t>
                     <t>
-                        Having requests or responses from mutually distrustful
-                        entities occurs when an intermediary either:
+                        互いに信用できないエンティティからのリクエストと
+                        レスポンスがあるのは中継者がどちらかの時です:
                         <list style="symbols">
                             <t>
-                                sends requests from multiple clients on a single
-                                connection toward an origin server, or
+                                複数のクライアントからのリクエストを一つの
+                                コネクション上でオリジンサーバに送る、または
                             </t>
                             <t>
-                                takes responses from multiple origin servers and
-                                places them on a shared connection toward a
-                                client.
+                                複数のオリジンサーバからのレスポンスを
+                                共有された一つのコネクション上でクライアントに送る。
                             </t>
                         </list>
-                        Web browsers also need to assume that requests made on
-                        the same connection by different <xref target="ORIGIN">web origins</xref> are made by mutually
-                        distrustful entities.
+                        Web ブラウザも異なる <xref target="ORIGIN">web オリジン</xref> 
+                        によって同じコネクションで作成されるリクエストが互いに信用
+                        できないエンティティによって作成されることを仮定する必要が
+                        あります。
                     </t>
                 </section>
 
-                <section title="Mitigation">
+                <section title="緩和">
                     <t>
-                        Users of HTTP that require confidentiality for header
-                        fields can use values with entropy sufficient to make
-                        guessing infeasible.  However, this is impractical as a
-                        general solution because it forces all users of HTTP to
-                        take steps to mitigate attacks.  It would impose new
-                        constraints on how HTTP is used.
+                        ヘッダフィールドの機密性が求められる HTTP のユーザは
+                        推測不可能にするのに十分なエントロピーを持つ値を
+                        使用することができます。しかしながら、これは一般的な
+                        解としては実用的ではありません。なぜならすべての
+                        HTTP のユーザに攻撃を緩和するためのステップを行う
+                        ことを強制することになるためです。 HTTP の使われ
+                        方に新たな制約を加えることになります。
                     </t>
                     <t>
-                        Rather than impose constraints on users of HTTP, an
-                        implementation of HPACK can instead constrain how
-                        compression is applied in order to limit the potential
-                        for dynamic table probing.
+                        HTTP のユーザに制約を課すのではなく、 HPACK の実装は
+                        動的テーブルの探り当ての可能性を制限するために圧縮の仕方を
+                        制限することで代えることができます。
                     </t>
                     <t>
-                        An ideal solution segregates access to the dynamic table
-                        based on the entity that is constructing header fields.
-                        Header field values that are added to the table are
-                        attributed to an entity, and only the entity that
-                        created a particular value can extract that value.
+                        理想的な解は動的テーブルへのアクセスをヘッダフィールドを
+                        構築するエンティティに基づいて分離することです。
+                        テーブルに追加されるヘッダフィールド値はエンティティに
+                        属し、その値を作成したエンティティのみが値を抽出
+                        できます。
                     </t>
                     <t>
-                        To improve compression performance of this option,
-                        certain entries might be tagged as being public.  For
-                        example, a web browser might make the values of the
-                        Accept-Encoding header field available in all requests.
+                        このオプションの圧縮性能を向上するため、信頼している
+                        エンティティは公開状態にタグ付けします。例えば、
+                        web ブラウザは Accept-Encoding ヘッダフィールドの
+                        値は全リクエストで使用可能にします。
                     </t>
                     <t>
-                        An encoder without good knowledge of the provenance of
-                        header fields might instead introduce a penalty for
-                        a header field with many different values, such that a
-                        large number of attempts to guess a header field
-                        value results in the header field no more being compared
-                        to the dynamic table entries in future messages,
-                        effectively preventing further guesses.
+                        ヘッダフィールドの出処の良い情報を持たないエンコーダは
+                        代わりに、更なる推測を効率的に防ぐため、すべての将来の
+                        リクエストの懸念からすべての値が削除されることに
+                        なるヘッダフィールド値の推測を試みるような、
+                        多くの異なる値をもつヘッダフィールドの報いを受ける可能性があります。
                         <list style="hanging">
                             <t hangText="Note:">
-                                Simply removing entries corresponding to the
-                                header field from the dynamic table
-                                can be ineffectual if the attacker has a
-                                reliable way of causing values to be
-                                reinstalled.  For example, a request to load an
-                                image in a web browser typically includes the
-                                Cookie header field (a potentially highly valued
-                                target for this sort of attack), and web sites
-                                can easily force an image to be loaded, thereby
-                                refreshing the entry in the dynamic table.
+                                もし攻撃者が値の再入を行える信頼できる経路を
+                                持つ場合、動的テーブルからのヘッダフィールドに
+                                対応するエントリの単純な削除では
+                                不十分である可能性があります。例えば、
+                                web ブラウザにおいて画像を読み込むための
+                                リクエストは典型的に Cookie ヘッダフィールド
+                                (この種類の攻撃で価値あるターゲットである可能性が
+                                高い) を含み、 web サイトは簡単に画像が
+                                読み込まれることを強制できるので、それによって
+                                動的テーブルのエントリはリフレッシュされます。
                             </t>
                         </list>
                     </t>
                     <t>
-                        This response might be made inversely proportional to
-                        the length of the header field value.  Marking a header
-                        field as not using the dynamic table any more
-                        might occur for shorter values more quickly
-                        or with higher probability than for longer values.
+                        このレスポンスはヘッダフィールドの長さと比較して
+                        復元される場合があります。ヘッダフィールドを動的
+                        テーブルを使わないようマークすることで短い値をより素早く、長い値より高い確率で
+                        起こる可能性があります。
                     </t>
                 </section>
 
-                <section anchor="never.indexed.literals" title="Never Indexed Literals">
+                <section anchor="never.indexed.literals" title="インデックスされないリテラル">
                     <t>
-                        Implementations can also choose to protect sensitive
-                        header fields by not compressing them and instead
-                        encoding their value as literals.
+                        実装は、圧縮せず代わりにリテラルとして値をエンコードすることで
+                        センシティブなヘッダフィールドを保護することを選ぶことも
+                        できます。
                     </t>
                     <t>
-                        Refusing to generate an indexed representation for a
-                        header field is only effective if compression is avoided
-                        on all hops.  The never indexed literal (see <xref target="literal.header.never.indexed"/>) can be used
-                        to signal to intermediaries that a particular value was
-                        intentionally sent as a literal.
-                    </t>
+                        ヘッダフィールドのインデックス表現の生成を止める
+                        ことは圧縮がすべてのホップで行われない場合のみ
+                        影響します。インデックスされないリテラル (<xref target="literal.header.never.indexed"/> を
+                        参照) は中継者に特定の値が意図的にリテラルとして
+                        送信されたことを通知するのに使用できます。                    </t>
                     <t>
-                        An intermediary MUST NOT re-encode a value that uses the
-                        never indexed literal representation with another
-                        representation that would index it. If HPACK is used
-                        for re-encoding, the never indexed literal
-                        representation MUST be used.
+                        中継者はインデックスされないリテラル表現を使った値を
+                        別のインデックスされる表現で再エンコードしては
+                        いけません (MUST NOT) 。 HPACK が再エンコードに使われる場合、
+                        インデックスされないリテラル表現を使わなければなりません (MUST) 。
                     </t>
                     <t>
                         The choice to use a never indexed literal representation
@@ -1207,22 +1192,22 @@ else
                 </section>
             </section>
 
-            <section title="Static Huffman Encoding">
+            <section title="静的ハフマンエンコーディング">
                 <t>
-                    There is no currently known attack against a static Huffman
-                    encoding. A study has shown that using a static Huffman
-                    encoding table created an information leakage, however this
-                    same study concluded that an attacker could not take
-                    advantage of this information leakage to recover any
-                    meaningful amount of information (see <xref target="PETAL"/>).
+                    静的ハフマンエンコーディングに対する現在知られている攻撃は
+                    ありません。静的ハフマンエンコーディングテーブルを用いる
+                    ことが情報漏えいを引き起こすことを示した研究がありますが、
+                    攻撃者は意味のある情報を復元するためにこの情報漏えいを
+                    利用することはできないと結論付けています (<xref target="PETAL"/> を参照) 。
                 </t>
             </section>
 
-            <section title="Memory Consumption">
+            <section title="メモリ消費">
                 <t>
-                    An attacker can try to cause an endpoint to exhaust its
-                    memory. HPACK is designed to limit both the peak and state
-                    amounts of memory allocated by an endpoint.
+                    攻撃者はエンドポイントがメモリを使い尽くすことを引き起こす
+                    ことを試みることができます。 HPACK はエンドポイントで
+                    割り当てられたメモリ量のピークと状態を制限するよう設計
+                    されています。
                 </t>
                 <t>
                     The amount of memory used by the compressor is limited by
@@ -1233,33 +1218,40 @@ else
                     This limit takes into account both the size of the data
                     stored in the dynamic table, plus a small allowance for
                     overhead.
+                    圧縮機によって使用されるメモリ量は、動的テーブルの
+                    最大サイズの定義を通して HPACK を使用するプロトコルによって
+                    制限されます。 HTTP/2 において、この値は設定パラメータ 
+                    SETTINGS_HEADER_TABLE_SIZE (<xref target="HTTP2"/> を通して
+                    デコーダによって制御されます。
+                    この制限は動的テーブルに格納されるデータのサイズと、
+                    加えてオーバーヘッドへの少しの配慮の両方を考慮しています。
                 </t>
                 <t>
-                    A decoder can limit the amount of state memory used by
-                    setting an appropriate value for the maximum size of the
-                    dynamic table. In HTTP/2, this is realized by setting an
-                    appropriate value for the SETTINGS_HEADER_TABLE_SIZE
-                    parameter.  An encoder can limit the amount of state memory
-                    it uses by signaling lower dynamic table size than the
-                    decoder allows (see <xref target="encoding.context.update"/>).
+                    デコーダは動的テーブルの最大サイズとして適切な
+                    値を設定することで状態メモリの量を制限できます。
+                    HTTP/2 において、 SETTINGS_HEADER_TABLE_SIZE パラメータに適切な
+                    値を設定することで実現されます。
+                    エンコーダはデコーダに許可された値未満の動的テーブル
+                    サイズを通知することで使用する状態メモリの量を制限できます。
+                    (<xref target="encoding.context.update"/> を参照)
                 </t>
                 <t>
-                    The amount of temporary memory consumed by an encoder or
-                    decoder can be limited by processing header fields
-                    sequentially.  An implementation does not need to retain a
-                    complete list of header fields.  Note however that it might
-                    be necessary for an application to retain a complete header
-                    list for other reasons; even though HPACK does not force
-                    this to occur, application constraints might make this
-                    necessary.
+                    エンコーダやデコーダで消費される一時メモリ量は
+                    ヘッダフィールドを連続的に処理することで制限できます。
+                    実装はヘッダフィールドの完全なリストを保持する必要は
+                    ありません。しかしながら他の理由のため完全なヘッダリストを
+                    保持することがアプリケーションによっては必要になるかも
+                    しれないことに注意してください; HPACK がこれを強制して
+                    いないにも関わらず、アプリケーションの制限はこれを必要と
+                    するかもしれません。
                 </t>
             </section>
 
-            <section title="Implementation Limits">
+            <section title="実装上の制限">
                 <t>
-                    An implementation of HPACK needs to ensure that large values
-                    for integers, long encoding for integers, or long string
-                    literals do not create security weaknesses.
+                    HPACK の実装は整数のための巨大な値、整数や長い文字列
+                    リテラルのための長いエンコーディングがセキュリティの弱点を
+                    生まないことを確実にすることが必要です。
                 </t>
                 <t>
                     An implementation has to set a limit for the values it
@@ -1267,28 +1259,31 @@ else
                     <xref target="integer.representation"/>).  In the same way,
                     it has to set a limit to the length it accepts for string
                     literals (see <xref target="string.literal.representation"/>).
+                    実装はエンコードされた長さ (<xref target="integer.representation"/> を参照)と
+                    同様、整数として受け入れる値を制限しなければ
+                    なりません。同様に、文字列リテラル(<xref target="string.literal.representation"/> を参照)
+                    として受け入れる長さを制限しなければなりません。
                 </t>
             </section>
 
         </section>
 
-        <section title="IANA Considerations">
+        <section title="IANA への配慮">
             <t>
-                This document has no IANA actions.
+                このドキュメントには IANA アクションはありません。
             </t>
         </section>
 
-        <section title="Acknowledgments">
+        <section title="謝辞">
             <t>
-                This specification includes substantial input from the following
-                individuals:
+                この仕様は下記の個人から得た有益な情報を含んでいます:
                 <list style="symbols">
                     <t>
                         Mike Bishop, Jeff Pinner, Julian Reschke, Martin Thomson
-                        (substantial editorial contributions).
+                        (価値ある編集上の貢献).
                     </t>
                     <t>
-                        Johnny Graettinger (Huffman code statistics).
+                        Johnny Graettinger (ハフマン符号統計).
                     </t>
                 </list>
             </t>
@@ -1296,7 +1291,7 @@ else
     </middle>
 
     <back>
-        <references title="Normative References">
+        <references title="引用文献">
             <reference anchor="HTTP2">
                 <front>
                     <title>Hypertext Transfer Protocol version 2</title>
@@ -1352,7 +1347,7 @@ else
 
         </references>
 
-        <references title="Informative References">
+        <references title="参考文献">
             <reference anchor="SPDY">
                 <front>
                     <title>SPDY Protocol</title>
@@ -1437,32 +1432,32 @@ else
             </reference>
         </references>
 
-        <section anchor="static.table.definition" title="Static Table Definition">
+        <section title="静的テーブル定義" anchor="static.table.definition">
             <t>
-                The static table (see <xref target="static.table"/>) consists in
-                a predefined and unchangeable list of header fields.
+                静的テーブル (<xref target="static.table"/> を参照) は
+                予め定義されており変更不可能なヘッダフィールドのリストで
+                構成されます。
             </t>
             <t>
-                The static table was created from the most frequent header
-                fields used by popular web sites, with the addition of
-                HTTP/2-specific pseudo-header fields (see Section 8.1.2.1 of <xref target="HTTP2"/>).
-                For header fields with a few frequent
-                values, an entry was added for each of these frequent values.
-                For other header fields, an entry was added with an empty
-                value.
+                静的テーブルは HTTP/2 特有の疑似ヘッダフィールド 
+                (<xref target="HTTP2"/> 8.1.2.1 節を参照) の追加を伴った、
+                有名な web サイトで最も頻繁に使用されたヘッダフィールドから
+                作成されました。少数のヘッダフィールドの値は頻繁に使用される値として
+                エントリに追加されています。その他のヘッダフィールドは、空の値で
+                追加されています。
             </t>
             <t>
-                The following table lists the predefined header fields that
-                make-up the static table.
+                下記のテーブルは静的テーブルを構成する予め定義されたヘッダ
+                フィールドを列挙しています。
             </t>
-            <texttable title="Static Table Entries" anchor="static.table.entries">
+            <texttable title="静的テーブルエントリ" anchor="static.table.entries">
                 <!-- An easy way to renumber these in vim, with mark a and b
                      delimiting the table entries:
                       :let @a=1 | 'a,'bs/>[0-9 ][0-9 ]*</\='>'.(@a+setreg('a',@a+1)).'<'/
                 -->
-                <ttcol>Index</ttcol>
-                <ttcol>Header Name</ttcol>
-                <ttcol>Header Value</ttcol>
+                <ttcol>インデックス</ttcol>
+                <ttcol>ヘッダ名</ttcol>
+                <ttcol>ヘッダ値</ttcol>
 
                 <c>1</c><c>:authority</c><c/>
                 <c>2</c><c>:method</c><c>GET</c>
@@ -1527,51 +1522,47 @@ else
                 <c>61</c><c>www-authenticate</c><c/>
             </texttable>
             <t>
-                <xref target="static.table.entries"/> gives the index of each
-                entry in the static table.
+                <xref target="static.table.entries"/> は静的テーブル内の
+                各エントリのインデックスを与えます。
             </t>
         </section>
 
-        <section anchor="huffman.code" title="Huffman Code">
+        <section anchor="huffman.code" title="ハフマン符号">
             <t>
-                The following Huffman code is used when encoding string literals
-                with a Huffman coding (see <xref target="string.literal.representation"/>).
+                下記のハフマン符号はハフマン符号化を伴う文字列リテラルの
+                エンコーディング時に使用されます(<xref target="string.literal.representation"/> を参照)。
             </t>
             <t>
-                This Huffman code was generated from statistics obtained on a
-                large sample of HTTP headers. It is a canonical Huffman code
-                (see <xref target="CANONICAL"/>) with some tweaking to ensure
-                that no symbol has a unique code length.
+                このハフマン符号は HTTP ヘッダの多くのサンプルで得られた
+                統計から生成されました。これはユニークなコード長を持つシンボルが
+                無いことを確実にするよう幾つかの微調整を行ったカノニカルハフマン
+                符号 (<xref target="CANONICAL"/> を参照) です。
             </t>
             <t>
-                Each row in the table defines the code used to represent a
-                symbol:
+                テーブルの各行はシンボルを表現するのに使用されるコードを定義します:
                 <list style="hanging">
                     <t hangText="sym:">
-                        The symbol to be represented. It is the decimal value of
-                        an octet, possibly prepended with its ASCII
-                        representation. A specific symbol, "EOS", is used to
-                        indicate the end of a string literal.
+                        表現されるシンボル。オクテットの 10 進数値です。可能で
+                        あればアスキー表現でも表記しています。特別なシンボル
+                        "EOS" は文字列リテラルの終わりを示すのに使用されます。
                     </t>
                     <t hangText="code as bits:">
-                        The Huffman code for the symbol represented as a base-2
-                        integer, aligned on the most significant bit (MSB).
+                        2 進数で表現されたシンボルのハフマンコード。
+                        最上位ビット (MSB) で調整されています。
                     </t>
                     <t hangText="code as hex:">
-                        The Huffman code for the symbol, represented as a
-                        hexadecimal integer, aligned on the least significant
-                        bit (LSB).
+                        16 進数で表現されたシンボルのハフマンコード。
+                        最下位ビット (LSB) で調整されています。
                     </t>
                     <t hangText="len:">
-                        The number of bits for the code representing the symbol.
+                        シンボルを表現するコードのビット数。
                     </t>
                 </list>
             </t>
             <t>
-                As an example, the code for the symbol 47 (corresponding to the
-                ASCII character "/") consists in the 6 bits "0", "1", "1", "0",
-                "0", "0". This corresponds to the value 0x18 (in hexadecimal)
-                encoded in 6 bits.
+                例として、シンボル 47 (アスキー文字 "/" に対応します) のコードは
+                6 ビット  "0", "1", "1", "0", "0", "0" から構成されます。
+                これは 6 ビットでエンコードされた値 0x18 (16 進数で) に対応します。
             </t>
             <figure>
                 <artwork><![CDATA[
@@ -1841,26 +1832,26 @@ EOS (256)  |11111111|11111111|11111111|111111      3fffffff  [30]
         </section>
 
 
-        <section anchor="examples" title="Examples">
+        <section anchor="examples" title="例">
             <t>
-                A number of examples are worked through here, covering integer
-                encoding, header field representation, and the encoding of whole
-                lists of header fields, for both requests and responses, and
-                with and without Huffman coding.
+                リクエストとレスポンス両方の、ハフマン符号化を伴う場合と
+                伴わない場合の、整数、ヘッダフィールド表現そしてヘッダ
+                フィールドのリストのすべてのエンコーディングを含む
+                数多くの例があります。
             </t>
 
-            <section anchor="integer.representation.examples" title="Integer Representation Examples">
+            <section anchor="integer.representation.examples" title="整数表現の例">
                 <t>
-                    This section shows the representation of integer values in
-                    details (see <xref target="integer.representation"/>).
+                    この節では (<xref target="integer.representation"/> を
+                    参照) に詳細がある整数値の表現の例を記述します。
                 </t>
-                <section anchor="integer.representation.example1" title="Example 1: Encoding 10 Using a 5-bit Prefix">
+                <section anchor="integer.representation.example1" title="例 1: 5 ビットプレフィックスを用いた 10 のエンコーディング">
                     <t>
-                        The value 10 is to be encoded with a 5-bit prefix.
+                        値 10 は 5 ビットプレフィックスでエンコードされます。
                         <list style="symbols">
                             <t>
-                                10 is less than 31 (2^5 - 1) and
-                                is represented using the 5-bit prefix.
+                                10 は 31 (2^5 - 1) より小さいので
+                                5 ビットプレフィックスを用いて表現されます。
                             </t>
                         </list>
                     </t>
@@ -1874,45 +1865,44 @@ EOS (256)  |11111111|11111111|11111111|111111      3fffffff  [30]
                     </figure>
                 </section>
 
-                <section anchor="integer.representation.example2" title="Example 2: Encoding 1337 Using a 5-bit Prefix">
+                <section anchor="integer.representation.example2" title="例 2: 5 ビットプレフィックスを用いた 1337 のエンコーディング">
                     <t>
-                        The value I=1337 is to be encoded with a 5-bit prefix.
+                        値 I=1337 は 5 ビットプレフィックスでエンコードされます。
                         <list>
                             <t>
-                                1337 is greater than 31 (2^5 - 1).
+                                1337 は 31 (2^5 - 1) より大きい。
                             </t>
                             <t>
                                 <list>
-                                    <t>The 5-bit prefix is filled with its max
-                                    value (31).</t>
+                                    <t> 5 ビットプレフィックスは 最大値(31) で
+                                        満たされます。</t>
                                 </list>
                             </t>
                             <t>I = 1337 - (2^5 - 1) = 1306.</t>
                             <t>
                                 <list>
-                                    <t>I (1306) is greater than or equal to 128,
-                                    the while loop body executes:</t>
+                                    <t>I (1306) は 128 以上で、
+                                    while ループ本体が実行します:</t>
                                     <t>
                                         <list>
                                             <t>I % 128 == 26</t>
                                             <t>26 + 128 == 154</t>
-                                            <t>154 is encoded in 8 bits as:
+                                            <t>154 は 8 ビットでエンコードされます:
                                             10011010</t>
-                                            <t>I is set to 10 (1306 / 128 ==
+                                            <t>I に 10 がセットされます (1306 / 128 ==
                                             10)</t>
-                                            <t>I is no longer greater than or
-                                            equal to 128, the while loop
-                                            terminates.</t>
+                                            <t>I は 128 より大きくなく、
+                                            while ループは終了します。</t>
                                         </list>
                                     </t>
                                     <t>
-                                        I, now 10, is encoded in 8 bits as:
+                                        10 になった I は 8 ビットでエンコードされます:
                                         00001010.
                                     </t>
                                 </list>
                             </t>
 
-                            <t>The process ends.</t>
+                            <t>処理終了。</t>
                         </list>
 
                     </t>
@@ -1928,15 +1918,14 @@ EOS (256)  |11111111|11111111|11111111|111111      3fffffff  [30]
                     </figure>
                 </section>
 
-                <section anchor="integer.representation.example3" title="Example 3: Encoding 42 Starting at an Octet Boundary">
+                <section anchor="integer.representation.example3" title="例 3: オクテット境界で開始する 42 のエンコーディング">
                     <t>
-                        The value 42 is to be encoded starting at an
-                        octet-boundary. This implies that a 8-bit prefix is
-                        used.
+                        値 42 はオクテット境界から開始しエンコードされます。
+                        これは 8 ビットプレフィックスが使用されることを示します。
                         <list style="symbols">
                             <t>
-                                42 is less than 255 (2^8 - 1) and
-                                is represented using the 8-bit prefix.
+                                42 は 255 (2^8 - 1) 以下であり
+                                8 ビットプレフィックスを用いて表現されます。
                             </t>
                         </list>
                     </t>
@@ -1952,25 +1941,25 @@ EOS (256)  |11111111|11111111|11111111|111111      3fffffff  [30]
             </section>
 
 <!-- example-start -->
-<section anchor="header.field.representation.examples" title="Header Field Representation Examples">
+<section anchor="header.field.representation.examples" title="ヘッダフィールド表現の例">
     <t>
-        This section shows several independent representation examples.
+        この節では幾つかの個々の表現の例を掲載します。
     </t>
-    <section title="Literal Header Field with Indexing">
+    <section title="インデックスを伴うリテラルヘッダフィールド">
         <t>
-            The header field representation uses a literal name and a literal
-            value. The header field is added to the dynamic table.
+            ヘッダフィールド表現はリテラル名とリテラル値を使用します。
+            ヘッダフィールドは動的テーブルに追加されます。
         </t>
         <t>
             <figure>
-                <preamble>Header list to encode:</preamble>
+                <preamble>エンコードするヘッダリスト:</preamble>
                 <artwork><![CDATA[
 custom-key: custom-header]]></artwork>
             </figure>
         </t>
         <t>
             <figure>
-                <preamble>Hex dump of encoded data:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork><![CDATA[
 400a 6375 7374 6f6d 2d6b 6579 0d63 7573 | @.custom-key.cus
 746f 6d2d 6865 6164 6572                | tom-header]]></artwork>
@@ -1978,7 +1967,7 @@ custom-key: custom-header]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Decoding process:</preamble>
+                <preamble>デコード処理:</preamble>
                 <artwork><![CDATA[
 40                                      | == Literal indexed ==
 0a                                      |   Literal name (len = 10)
@@ -1991,7 +1980,7 @@ custom-key: custom-header]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Dynamic Table (after decoding):</preamble>
+                <preamble>動的テーブル (デコード後):</preamble>
                 <artwork><![CDATA[
 [  1] (s =  55) custom-key: custom-header
       Table size:  55]]></artwork>
@@ -1999,35 +1988,35 @@ custom-key: custom-header]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Decoded header list:</preamble>
+                <preamble>デコードされたヘッダリスト:</preamble>
                 <artwork><![CDATA[
 custom-key: custom-header]]></artwork>
             </figure>
         </t>
     </section>
 
-    <section title="Literal Header Field without Indexing">
+    <section title="インデックスを伴わないリテラルヘッダフィールド">
         <t>
-            The header field representation uses an indexed name and a literal
-            value. The header field is not added to the dynamic table.
+            ヘッダフィールド表現はリテラル名とリテラル値を使用します。
+            ヘッダフィールドは動的テーブルに追加されません。
         </t>
         <t>
             <figure>
-                <preamble>Header list to encode:</preamble>
+                <preamble>エンコードするヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :path: /sample/path]]></artwork>
             </figure>
         </t>
         <t>
             <figure>
-                <preamble>Hex dump of encoded data:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork><![CDATA[
 040c 2f73 616d 706c 652f 7061 7468      | ../sample/path]]></artwork>
             </figure>
         </t>
         <t>
             <figure>
-                <preamble>Decoding process:</preamble>
+                <preamble>デコード処理:</preamble>
                 <artwork><![CDATA[
 04                                      | == Literal not indexed ==
                                         |   Indexed name (idx = 4)
@@ -2038,33 +2027,33 @@ custom-key: custom-header]]></artwork>
             </figure>
         </t>
         <t>
-          Dynamic table (after decoding): empty.
+          動的テーブル (デコード後): 空
         </t>
         <t>
             <figure>
-                <preamble>Decoded header list:</preamble>
+                <preamble>デコードされたヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :path: /sample/path]]></artwork>
             </figure>
         </t>
     </section>
 
-    <section title="Literal Header Field never Indexed">
+    <section title="インデックスされないリテラルヘッダフィールド">
         <t>
-            The header field representation uses a literal name and a literal
-            value. The header field is not added to the dynamic table, and must
-            use the same representation if re-encoded by an intermediary.
+            ヘッダフィールド表現はリテラル名とリテラル値を使用します。
+            ヘッダフィールドは動的テーブルに追加されず、中継者に
+            再エンコードされる場合同じ表現を使わなければなりません。
         </t>
         <t>
             <figure>
-                <preamble>Header list to encode:</preamble>
+                <preamble>エンコードするヘッダリスト:</preamble>
                 <artwork><![CDATA[
 password: secret]]></artwork>
             </figure>
         </t>
         <t>
             <figure>
-                <preamble>Hex dump of encoded data:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork><![CDATA[
 1008 7061 7373 776f 7264 0673 6563 7265 | ..password.secre
 74                                      | t]]></artwork>
@@ -2072,7 +2061,7 @@ password: secret]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Decoding process:</preamble>
+                <preamble>デコード処理:</preamble>
                 <artwork><![CDATA[
 10                                      | == Literal never indexed ==
 08                                      |   Literal name (len = 8)
@@ -2083,39 +2072,39 @@ password: secret]]></artwork>
             </figure>
         </t>
         <t>
-          Dynamic table (after decoding): empty.
+          動的テーブル (デコード後): 空
         </t>
         <t>
             <figure>
-                <preamble>Decoded header list:</preamble>
+                <preamble>デコードされたヘッダリスト:</preamble>
                 <artwork><![CDATA[
 password: secret]]></artwork>
             </figure>
         </t>
     </section>
 
-    <section title="Indexed Header Field">
+    <section title="インデックスヘッダフィールド">
         <t>
-            The header field representation uses an indexed header field, from
-            the static table.
+            このヘッダフィールド表現は静的テーブルにインデックスされたヘッダ
+            フィールドを使用します。
         </t>
         <t>
             <figure>
-                <preamble>Header list to encode:</preamble>
+                <preamble>エンコードするヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :method: GET]]></artwork>
             </figure>
         </t>
         <t>
             <figure>
-                <preamble>Hex dump of encoded data:</preamble>
+                <preamble>エンコードされたデータの 16 進ダンプ:</preamble>
                 <artwork><![CDATA[
 82                                      | .]]></artwork>
             </figure>
         </t>
         <t>
             <figure>
-                <preamble>Decoding process:</preamble>
+                <preamble>デコード処理:</preamble>
                 <artwork><![CDATA[
 82                                      | == Indexed - Add ==
                                         |   idx = 2
@@ -2123,11 +2112,11 @@ password: secret]]></artwork>
             </figure>
         </t>
         <t>
-          Dynamic table (after decoding): empty.
+          動的テーブル (デコード後): 空
         </t>
         <t>
             <figure>
-                <preamble>Decoded header list:</preamble>
+                <preamble>デコードされたヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :method: GET]]></artwork>
             </figure>
@@ -2135,15 +2124,15 @@ password: secret]]></artwork>
     </section>
 
 </section>
-<section anchor="request.examples.without.huffman.coding" title="Request Examples without Huffman Coding">
+<section anchor="request.examples.without.huffman.coding" title="ハフマン符号化を伴わないリクエストの例">
     <t>
-        This section shows several consecutive header lists, corresponding to
-        HTTP requests, on the same connection.
+        この節は同じコネクションにおける HTTP リクエストに対応した
+        幾つかの連続したヘッダリストを示します。
     </t>
-    <section title="First Request">
+    <section title="一個目のリクエスト">
         <t>
             <figure>
-                <preamble>Header list to encode:</preamble>
+                <preamble>エンコードするヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :method: GET
 :scheme: http
@@ -2153,7 +2142,7 @@ password: secret]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Hex dump of encoded data:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork><![CDATA[
 8286 8441 0f77 7777 2e65 7861 6d70 6c65 | ...A.www.example
 2e63 6f6d                               | .com]]></artwork>
@@ -2161,7 +2150,7 @@ password: secret]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Decoding process:</preamble>
+                <preamble>デコード処理:</preamble>
                 <artwork><![CDATA[
 82                                      | == Indexed - Add ==
                                         |   idx = 2
@@ -2183,7 +2172,7 @@ password: secret]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Dynamic Table (after decoding):</preamble>
+                <preamble>動的テーブル (デコード後):</preamble>
                 <artwork><![CDATA[
 [  1] (s =  57) :authority: www.example.com
       Table size:  57]]></artwork>
@@ -2191,7 +2180,7 @@ password: secret]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Decoded header list:</preamble>
+                <preamble>デコードされたヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :method: GET
 :scheme: http
@@ -2201,10 +2190,10 @@ password: secret]]></artwork>
         </t>
     </section>
 
-    <section title="Second Request">
+    <section title="二個目のリクエスト">
         <t>
             <figure>
-                <preamble>Header list to encode:</preamble>
+                <preamble>エンコードするヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :method: GET
 :scheme: http
@@ -2215,14 +2204,14 @@ cache-control: no-cache]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Hex dump of encoded data:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork><![CDATA[
 8286 84be 5808 6e6f 2d63 6163 6865      | ....X.no-cache]]></artwork>
             </figure>
         </t>
         <t>
             <figure>
-                <preamble>Decoding process:</preamble>
+                <preamble>デコード処理:</preamble>
                 <artwork><![CDATA[
 82                                      | == Indexed - Add ==
                                         |   idx = 2
@@ -2247,7 +2236,7 @@ be                                      | == Indexed - Add ==
         </t>
         <t>
             <figure>
-                <preamble>Dynamic Table (after decoding):</preamble>
+                <preamble>動的テーブル (デコード後):</preamble>
                 <artwork><![CDATA[
 [  1] (s =  53) cache-control: no-cache
 [  2] (s =  57) :authority: www.example.com
@@ -2256,7 +2245,7 @@ be                                      | == Indexed - Add ==
         </t>
         <t>
             <figure>
-                <preamble>Decoded header list:</preamble>
+                <preamble>デコードされたヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :method: GET
 :scheme: http
@@ -2267,10 +2256,10 @@ cache-control: no-cache]]></artwork>
         </t>
     </section>
 
-    <section title="Third Request">
+    <section title="三個目のリクエスト">
         <t>
             <figure>
-                <preamble>Header list to encode:</preamble>
+                <preamble>エンコードするヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :method: GET
 :scheme: https
@@ -2281,7 +2270,7 @@ custom-key: custom-value]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Hex dump of encoded data:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork><![CDATA[
 8287 85bf 400a 6375 7374 6f6d 2d6b 6579 | ....@.custom-key
 0c63 7573 746f 6d2d 7661 6c75 65        | .custom-value]]></artwork>
@@ -2289,7 +2278,7 @@ custom-key: custom-value]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Decoding process:</preamble>
+                <preamble>デコード処理:</preamble>
                 <artwork><![CDATA[
 82                                      | == Indexed - Add ==
                                         |   idx = 2
@@ -2315,7 +2304,7 @@ bf                                      | == Indexed - Add ==
         </t>
         <t>
             <figure>
-                <preamble>Dynamic Table (after decoding):</preamble>
+                <preamble>動的テーブル (デコード後):</preamble>
                 <artwork><![CDATA[
 [  1] (s =  54) custom-key: custom-value
 [  2] (s =  53) cache-control: no-cache
@@ -2325,7 +2314,7 @@ bf                                      | == Indexed - Add ==
         </t>
         <t>
             <figure>
-                <preamble>Decoded header list:</preamble>
+                <preamble>デコードされたヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :method: GET
 :scheme: https
@@ -2337,15 +2326,15 @@ custom-key: custom-value]]></artwork>
     </section>
 
 </section>
-<section anchor="request.examples.with.huffman.coding" title="Request Examples with Huffman Coding">
+<section anchor="request.examples.with.huffman.coding" title="ハフマン符号化を伴うリクエストの例">
     <t>
-        This section shows the same examples as the previous section, but using
-        Huffman encoding for the literal values.
+        この節では前節と同じ例を示しますが、リテラル値にハフマン符号化を
+        行います。
     </t>
-    <section title="First Request">
+    <section title="一個目のリクエスト">
         <t>
             <figure>
-                <preamble>Header list to encode:</preamble>
+                <preamble>エンコードするヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :method: GET
 :scheme: http
@@ -2355,7 +2344,7 @@ custom-key: custom-value]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Hex dump of encoded data:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork><![CDATA[
 8286 8441 8cf1 e3c2 e5f2 3a6b a0ab 90f4 | ...A......:k....
 ff                                      | .]]></artwork>
@@ -2363,7 +2352,7 @@ ff                                      | .]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Decoding process:</preamble>
+                <preamble>デコード処理:</preamble>
                 <artwork><![CDATA[
 82                                      | == Indexed - Add ==
                                         |   idx = 2
@@ -2388,7 +2377,7 @@ f1e3 c2e5 f23a 6ba0 ab90 f4ff           | .....:k.....
         </t>
         <t>
             <figure>
-                <preamble>Dynamic Table (after decoding):</preamble>
+                <preamble>動的テーブル (デコード後):</preamble>
                 <artwork><![CDATA[
 [  1] (s =  57) :authority: www.example.com
       Table size:  57]]></artwork>
@@ -2396,7 +2385,7 @@ f1e3 c2e5 f23a 6ba0 ab90 f4ff           | .....:k.....
         </t>
         <t>
             <figure>
-                <preamble>Decoded header list:</preamble>
+                <preamble>デコードされたヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :method: GET
 :scheme: http
@@ -2406,10 +2395,10 @@ f1e3 c2e5 f23a 6ba0 ab90 f4ff           | .....:k.....
         </t>
     </section>
 
-    <section title="Second Request">
+    <section title="二個目のリクエスト">
         <t>
             <figure>
-                <preamble>Header list to encode:</preamble>
+                <preamble>エンコードするヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :method: GET
 :scheme: http
@@ -2420,14 +2409,14 @@ cache-control: no-cache]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Hex dump of encoded data:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork><![CDATA[
 8286 84be 5886 a8eb 1064 9cbf           | ....X....d..]]></artwork>
             </figure>
         </t>
         <t>
             <figure>
-                <preamble>Decoding process:</preamble>
+                <preamble>デコード処理:</preamble>
                 <artwork><![CDATA[
 82                                      | == Indexed - Add ==
                                         |   idx = 2
@@ -2455,7 +2444,7 @@ a8eb 1064 9cbf                          | ...d..
         </t>
         <t>
             <figure>
-                <preamble>Dynamic Table (after decoding):</preamble>
+                <preamble>動的テーブル (デコード後):</preamble>
                 <artwork><![CDATA[
 [  1] (s =  53) cache-control: no-cache
 [  2] (s =  57) :authority: www.example.com
@@ -2464,7 +2453,7 @@ a8eb 1064 9cbf                          | ...d..
         </t>
         <t>
             <figure>
-                <preamble>Decoded header list:</preamble>
+                <preamble>デコードされたヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :method: GET
 :scheme: http
@@ -2475,10 +2464,10 @@ cache-control: no-cache]]></artwork>
         </t>
     </section>
 
-    <section title="Third Request">
+    <section title="三個目のリクエスト">
         <t>
             <figure>
-                <preamble>Header list to encode:</preamble>
+                <preamble>エンコードするヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :method: GET
 :scheme: https
@@ -2489,7 +2478,7 @@ custom-key: custom-value]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Hex dump of encoded data:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork><![CDATA[
 8287 85bf 4088 25a8 49e9 5ba9 7d7f 8925 | ....@.%.I.[.}..%
 a849 e95b b8e8 b4bf                     | .I.[....]]></artwork>
@@ -2497,7 +2486,7 @@ a849 e95b b8e8 b4bf                     | .I.[....]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Decoding process:</preamble>
+                <preamble>デコード処理:</preamble>
                 <artwork><![CDATA[
 82                                      | == Indexed - Add ==
                                         |   idx = 2
@@ -2529,7 +2518,7 @@ bf                                      | == Indexed - Add ==
         </t>
         <t>
             <figure>
-                <preamble>Dynamic Table (after decoding):</preamble>
+                <preamble>動的テーブル (デコード後):</preamble>
                 <artwork><![CDATA[
 [  1] (s =  54) custom-key: custom-value
 [  2] (s =  53) cache-control: no-cache
@@ -2539,7 +2528,7 @@ bf                                      | == Indexed - Add ==
         </t>
         <t>
             <figure>
-                <preamble>Decoded header list:</preamble>
+                <preamble>デコードされたヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :method: GET
 :scheme: https
@@ -2551,17 +2540,17 @@ custom-key: custom-value]]></artwork>
     </section>
 
 </section>
-<section anchor="response.examples.without.huffman.coding" title="Response Examples without Huffman Coding">
+<section anchor="response.examples.without.huffman.coding" title="ハフマン符号化を伴わないレスポンスの例">
     <t>
-        This section shows several consecutive header lists, corresponding to
-        HTTP responses, on the same connection. The HTTP/2 setting parameter
-        SETTINGS_HEADER_TABLE_SIZE is set to the value of 256 octets, causing
-        some evictions to occur.
+        この節は同じコネクションにおける HTTP レスポンスに対応した
+        幾つかの連続したヘッダリストを示します。 HTTP/2 設定パラメータ
+        SETTINGS_HEADER_TABLE_SIZE は幾つかの削除を起こすため、 256 
+        オクテットの値で設定されています。
     </t>
-    <section title="First Response">
+    <section title="一個目のレスポンス">
         <t>
             <figure>
-                <preamble>Header list to encode:</preamble>
+                <preamble>エンコードするヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :status: 302
 cache-control: private
@@ -2571,7 +2560,7 @@ location: https://www.example.com]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Hex dump of encoded data:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork><![CDATA[
 4803 3330 3258 0770 7269 7661 7465 611d | H.302X.privatea.
 4d6f 6e2c 2032 3120 4f63 7420 3230 3133 | Mon, 21 Oct 2013
@@ -2582,7 +2571,7 @@ location: https://www.example.com]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Decoding process:</preamble>
+                <preamble>デコード処理:</preamble>
                 <artwork><![CDATA[
 48                                      | == Literal indexed ==
                                         |   Indexed name (idx = 8)
@@ -2616,7 +2605,7 @@ location: https://www.example.com]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Dynamic Table (after decoding):</preamble>
+                <preamble>動的テーブル (デコード後):</preamble>
                 <artwork><![CDATA[
 [  1] (s =  63) location: https://www.example.com
 [  2] (s =  65) date: Mon, 21 Oct 2013 20:13:21 GMT
@@ -2627,7 +2616,7 @@ location: https://www.example.com]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Decoded header list:</preamble>
+                <preamble>デコードされたヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :status: 302
 cache-control: private
@@ -2637,14 +2626,14 @@ location: https://www.example.com]]></artwork>
         </t>
     </section>
 
-    <section title="Second Response">
+    <section title="二個目のレスポンス">
         <t>
-            The (":status", "302") header field is evicted from the dynamic table
-            to free space to allow adding the (":status", "307") header field.
+            (":status", "307") ヘッダフィールドの追加を行える領域を解放するため
+            (":status", "302") ヘッダフィールドは動的テーブルから削除されます。
         </t>
         <t>
             <figure>
-                <preamble>Header list to encode:</preamble>
+                <preamble>エンコードするヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :status: 307
 cache-control: private
@@ -2654,14 +2643,14 @@ location: https://www.example.com]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Hex dump of encoded data:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork><![CDATA[
 4803 3330 37c1 c0bf                     | H.307...]]></artwork>
             </figure>
         </t>
         <t>
             <figure>
-                <preamble>Decoding process:</preamble>
+                <preamble>デコード処理:</preamble>
                 <artwork><![CDATA[
 48                                      | == Literal indexed ==
                                         |   Indexed name (idx = 8)
@@ -2685,7 +2674,7 @@ bf                                      | == Indexed - Add ==
         </t>
         <t>
             <figure>
-                <preamble>Dynamic Table (after decoding):</preamble>
+                <preamble>動的テーブル (デコード後):</preamble>
                 <artwork><![CDATA[
 [  1] (s =  42) :status: 307
 [  2] (s =  63) location: https://www.example.com
@@ -2696,7 +2685,7 @@ bf                                      | == Indexed - Add ==
         </t>
         <t>
             <figure>
-                <preamble>Decoded header list:</preamble>
+                <preamble>デコードされたヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :status: 307
 cache-control: private
@@ -2706,14 +2695,14 @@ location: https://www.example.com]]></artwork>
         </t>
     </section>
 
-    <section title="Third Response">
+    <section title="三個目のレスポンス">
         <t>
-            Several header fields are evicted from the dynamic table during the
-            processing of this header list.
+            このヘッダリストの処理中幾つかのヘッダフィールドが動的テーブルから
+            削除されます。
         </t>
         <t>
             <figure>
-                <preamble>Header list to encode:</preamble>
+                <preamble>エンコードするヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :status: 200
 cache-control: private
@@ -2725,7 +2714,7 @@ set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1]]></artwork
         </t>
         <t>
             <figure>
-                <preamble>Hex dump of encoded data:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork><![CDATA[
 88c1 611d 4d6f 6e2c 2032 3120 4f63 7420 | ..a.Mon, 21 Oct
 3230 3133 2032 303a 3133 3a32 3220 474d | 2013 20:13:22 GM
@@ -2738,7 +2727,7 @@ set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1]]></artwork
         </t>
         <t>
             <figure>
-                <preamble>Decoding process:</preamble>
+                <preamble>デコード処理:</preamble>
                 <artwork><![CDATA[
 88                                      | == Indexed - Add ==
                                         |   idx = 8
@@ -2786,7 +2775,7 @@ c0                                      | == Indexed - Add ==
         </t>
         <t>
             <figure>
-                <preamble>Dynamic Table (after decoding):</preamble>
+                <preamble>動的テーブル (デコード後):</preamble>
                 <artwork><![CDATA[
 [  1] (s =  98) set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age\
                  =3600; version=1
@@ -2797,7 +2786,7 @@ c0                                      | == Indexed - Add ==
         </t>
         <t>
             <figure>
-                <preamble>Decoded header list:</preamble>
+                <preamble>デコードされたヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :status: 200
 cache-control: private
@@ -2810,19 +2799,18 @@ set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1]]></artwork
     </section>
 
 </section>
-<section anchor="response.examples.with.huffman.coding" title="Response Examples with Huffman Coding">
+<section anchor="response.examples.with.huffman.coding" title="ハフマン符号化を伴うレスポンスの例">
     <t>
-        This section shows the same examples as the previous section, but using
-        Huffman encoding for the literal values. The HTTP/2 setting parameter
-        SETTINGS_HEADER_TABLE_SIZE is set to the value of 256 octets, causing
-        some evictions to occur. The eviction mechanism uses the length of the
-        decoded literal values, so the same evictions occurs as in the previous
-        section.
+        この節は同じコネクションにおける HTTP レスポンスに対応した
+        幾つかの連続したヘッダリストを示します。 HTTP/2 設定パラメータ
+        SETTINGS_HEADER_TABLE_SIZE は幾つかの削除を起こすため、 256 
+        オクテットの値で設定されています。削除メカニズムはデコードされた
+        リテラル値の長さを使用するため、前節と同じ削除処理が起こります。
     </t>
-    <section title="First Response">
+    <section title="一個目のレスポンス">
         <t>
             <figure>
-                <preamble>Header list to encode:</preamble>
+                <preamble>エンコードするヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :status: 302
 cache-control: private
@@ -2832,7 +2820,7 @@ location: https://www.example.com]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Hex dump of encoded data:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork><![CDATA[
 4882 6402 5885 aec3 771a 4b61 96d0 7abe | H.d.X...w.Ka..z.
 9410 54d4 44a8 2005 9504 0b81 66e0 82a6 | ..T.D. .....f...
@@ -2842,7 +2830,7 @@ e9ae 82ae 43d3                          | ....C.]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Decoding process:</preamble>
+                <preamble>デコード処理:</preamble>
                 <artwork><![CDATA[
 48                                      | == Literal indexed ==
                                         |   Indexed name (idx = 8)
@@ -2889,7 +2877,7 @@ d3                                      | .
         </t>
         <t>
             <figure>
-                <preamble>Dynamic Table (after decoding):</preamble>
+                <preamble>動的テーブル (デコード後):</preamble>
                 <artwork><![CDATA[
 [  1] (s =  63) location: https://www.example.com
 [  2] (s =  65) date: Mon, 21 Oct 2013 20:13:21 GMT
@@ -2900,7 +2888,7 @@ d3                                      | .
         </t>
         <t>
             <figure>
-                <preamble>Decoded header list:</preamble>
+                <preamble>デコードされたヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :status: 302
 cache-control: private
@@ -2910,14 +2898,14 @@ location: https://www.example.com]]></artwork>
         </t>
     </section>
 
-    <section title="Second Response">
+    <section title="二個目のレスポンス">
         <t>
-            The (":status", "302") header field is evicted from the dynamic table
-            to free space to allow adding the (":status", "307") header field.
+            (":status", "307") ヘッダフィールドの追加を行える領域を解放するため
+            (":status", "302") ヘッダフィールドは動的テーブルから削除されます。
         </t>
         <t>
             <figure>
-                <preamble>Header list to encode:</preamble>
+                <preamble>エンコードするヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :status: 307
 cache-control: private
@@ -2927,14 +2915,14 @@ location: https://www.example.com]]></artwork>
         </t>
         <t>
             <figure>
-                <preamble>Hex dump of encoded data:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork><![CDATA[
 4883 640e ffc1 c0bf                     | H.d.....]]></artwork>
             </figure>
         </t>
         <t>
             <figure>
-                <preamble>Decoding process:</preamble>
+                <preamble>デコード処理:</preamble>
                 <artwork><![CDATA[
 48                                      | == Literal indexed ==
                                         |   Indexed name (idx = 8)
@@ -2961,7 +2949,7 @@ bf                                      | == Indexed - Add ==
         </t>
         <t>
             <figure>
-                <preamble>Dynamic Table (after decoding):</preamble>
+                <preamble>動的テーブル (デコード後):</preamble>
                 <artwork><![CDATA[
 [  1] (s =  42) :status: 307
 [  2] (s =  63) location: https://www.example.com
@@ -2972,7 +2960,7 @@ bf                                      | == Indexed - Add ==
         </t>
         <t>
             <figure>
-                <preamble>Decoded header list:</preamble>
+                <preamble>デコードされたヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :status: 307
 cache-control: private
@@ -2982,14 +2970,14 @@ location: https://www.example.com]]></artwork>
         </t>
     </section>
 
-    <section title="Third Response">
+    <section title="三個目のレスポンス">
         <t>
-            Several header fields are evicted from the dynamic table during the
-            processing of this header list.
+            このヘッダリストの処理中幾つかのヘッダフィールドが動的テーブルから
+            削除されます。
         </t>
         <t>
             <figure>
-                <preamble>Header list to encode:</preamble>
+                <preamble>エンコードするヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :status: 200
 cache-control: private
@@ -3001,7 +2989,7 @@ set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1]]></artwork
         </t>
         <t>
             <figure>
-                <preamble>Hex dump of encoded data:</preamble>
+                <preamble>エンコードされたデータの 16 進数ダンプ:</preamble>
                 <artwork><![CDATA[
 88c1 6196 d07a be94 1054 d444 a820 0595 | ..a..z...T.D. ..
 040b 8166 e084 a62d 1bff c05a 839b d9ab | ...f...-...Z....
@@ -3012,7 +3000,7 @@ set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1]]></artwork
         </t>
         <t>
             <figure>
-                <preamble>Decoding process:</preamble>
+                <preamble>デコード処理:</preamble>
                 <artwork><![CDATA[
 88                                      | == Indexed - Add ==
                                         |   idx = 8
@@ -3071,7 +3059,7 @@ d5af 2708 7f36 72c1 ab27 0fb5 291f 9587 | ..'..6r..'..)...
         </t>
         <t>
             <figure>
-                <preamble>Dynamic Table (after decoding):</preamble>
+                <preamble>動的テーブル (デコード後):</preamble>
                 <artwork><![CDATA[
 [  1] (s =  98) set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age\
                  =3600; version=1
@@ -3082,7 +3070,7 @@ d5af 2708 7f36 72c1 ab27 0fb5 291f 9587 | ..'..6r..'..)...
         </t>
         <t>
             <figure>
-                <preamble>Decoded header list:</preamble>
+                <preamble>デコードされたヘッダリスト:</preamble>
                 <artwork><![CDATA[
 :status: 200
 cache-control: private
