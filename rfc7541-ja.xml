@@ -312,9 +312,9 @@
                     リテラルで表現できます。
                 </t>
                 <t>
-                    An indexed representation defines a header field as a
-                    reference to an entry in either the static table or the
-                    dynamic table (see <xref target="indexed.header.representation"/>).
+                    インデックス表現はヘッダフィールドを静的テーブルもしくは
+                    動的テーブルのエントリへの参照として定義します。 
+                    (<xref target="indexed.header.representation"/> を参照)
                 </t>
                 <t>
                     リテラル表現は名前と値を指定することでヘッダフィールドを
@@ -1155,7 +1155,8 @@ else
                         ことは圧縮がすべてのホップで行われない場合のみ
                         影響します。インデックスされないリテラル (<xref target="literal.header.never.indexed"/> を
                         参照) は中継者に特定の値が意図的にリテラルとして
-                        送信されたことを通知するのに使用できます。                    </t>
+                        送信されたことを通知するのに使用できます。
+                    </t>
                     <t>
                         中継者はインデックスされないリテラル表現を使った値を
                         別のインデックスされる表現で再エンコードしては
@@ -1163,31 +1164,31 @@ else
                         インデックスされないリテラル表現を使わなければなりません (MUST) 。
                     </t>
                     <t>
-                        The choice to use a never indexed literal representation
-                        for a header field depends on several factors. Since
-                        HPACK doesn't protect against guessing an entire header
-                        field value, short or low-entropy values are more
-                        readily recovered by an adversary. Therefore, an encoder
-                        might choose not to index values with low entropy.
+                        ヘッダフィールドにインデックスされないリテラル表現を
+                        使用する選択は、幾つかの要因に依存します。 HPACK は
+                        全体のヘッダフィールド値の推測に対抗する保護を行わないため、
+                        短いかエントロピーの低い値は攻撃者によってより容易に復元しやすく
+                        なります。従って、エンコーダは低いエントロピーの値のインデックス
+                        を行わないことを選ぶこともできます。
                     </t>
                     <t>
-                        An encoder might also choose not to index values for
-                        header fields that are considered to be highly valuable
-                        or sensitive to recovery, such as the Cookie or
-                        Authorization header fields.
+                        エンコーダは Cookie や Authorization ヘッダフィールドのような、
+                        重要でセンシティブなヘッダフィールドの復元を考慮して
+                        ヘッダフィールドの値のインデックスを行わないことを選ぶことも
+                        できます。
                     </t>
                     <t>
-                        On the contrary, an encoder might prefer indexing values
-                        for header fields that have little or no value if they
-                        were exposed. For instance, a User-Agent header field
-                        does not commonly vary between requests and is sent to
-                        any server. In that case, confirmation that a particular
-                        User-Agent value has been used provides little value.
+                        それどころか、エンコーダは露出される場合少しの値をもつ、
+                        もしくは値のないヘッダフィールドの値をインデックスすることを
+                        選ぶこともできます。例えば、 User-Agent ヘッダフィールドは
+                        リクエスト毎に変化することがなく、任意のサーバに送られます。
+                        この場合、特に User-Agent に使われる値の確認は少ない値で
+                        与えられます。
                     </t>
                     <t>
-                        Note that these criteria for deciding to use a never
-                        indexed literal representation will evolve over time as
-                        new attacks are discovered.
+                        これらのインデックスされないリテラル表現の使用の決定基準は
+                        新しい攻撃の発見により時間を経て発展する可能性があることに
+                        注意してください。
                     </t>
                 </section>
             </section>
@@ -1210,14 +1211,6 @@ else
                     されています。
                 </t>
                 <t>
-                    The amount of memory used by the compressor is limited by
-                    the protocol using HPACK through the definition of the
-                    maximum size of the dynamic table.
-                    In HTTP/2, this value is controlled by the decoder through
-                    the setting parameter SETTINGS_HEADER_TABLE_SIZE (see Section 6.5.2 of <xref target="HTTP2"/>).
-                    This limit takes into account both the size of the data
-                    stored in the dynamic table, plus a small allowance for
-                    overhead.
                     圧縮機によって使用されるメモリ量は、動的テーブルの
                     最大サイズの定義を通して HPACK を使用するプロトコルによって
                     制限されます。 HTTP/2 において、この値は設定パラメータ 
@@ -1254,11 +1247,6 @@ else
                     生まないことを確実にすることが必要です。
                 </t>
                 <t>
-                    An implementation has to set a limit for the values it
-                    accepts for integers, as well as for the encoded length (see
-                    <xref target="integer.representation"/>).  In the same way,
-                    it has to set a limit to the length it accepts for string
-                    literals (see <xref target="string.literal.representation"/>).
                     実装はエンコードされた長さ (<xref target="integer.representation"/> を参照)と
                     同様、整数として受け入れる値を制限しなければ
                     なりません。同様に、文字列リテラル(<xref target="string.literal.representation"/> を参照)
