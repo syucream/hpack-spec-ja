@@ -14,8 +14,6 @@
 <?rfc comments="yes"?>
 <?rfc inline="yes"?>
 <?rfc rfcedstyle="yes"?>
-<!DOCTYPE rfc
-  PUBLIC "" "lib/rfc2629.dtd">
 <rfc ipr="trust200902" number="7541" category="std" consensus="yes">
     
     <front>
