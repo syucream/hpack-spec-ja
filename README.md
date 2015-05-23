@@ -9,6 +9,6 @@ How to create translated specification
 ```
 $ git submodule init
 $ git submodule update
-$ xsltproc rfc2629.xslt draft-ietf-httpbis-header-compression-10-ja.xml > header-compression-10-ja.html
+$ sh generate.sh rfc7541-ja.xml rfc2629.xslt > rfc7541-ja.html
 ```
 
