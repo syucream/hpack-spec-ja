@@ -1,4 +1,4 @@
 target=$1
 style="rfc2629.xslt"
 
-java -classpath http2-spec/lib/saxon9.jar net.sf.saxon.Transform -novw -l $target $style | sed -f http2-spec/lib/addstyle.sed
+perl -pe "s/^\s+//g" $1 | perl -pe "s/([^\x01-\x7E])\n/\$1/g" | java -classpath http2-spec/lib/saxon9.jar net.sf.saxon.Transform -novw -l /dev/stdin $style | sed -f http2-spec/lib/addstyle.sed
