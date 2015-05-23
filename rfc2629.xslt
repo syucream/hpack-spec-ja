@@ -1183,7 +1183,7 @@
     <xsl:variable name="n"><xsl:call-template name="get-figure-number"/></xsl:variable>
     <p class="figure">
       <xsl:if test="not(starts-with($n,'u'))">
-        <xsl:text>Figure </xsl:text>
+        <xsl:text>図 </xsl:text>
         <xsl:value-of select="$n"/>
         <xsl:if test="@title!=''">: </xsl:if>
       </xsl:if>
@@ -3654,8 +3654,8 @@
 <!-- produce back section with author information -->
 <xsl:template name="get-authors-section-title">
   <xsl:choose>
-    <xsl:when test="count(/rfc/front/author)=1">Author's Address</xsl:when>
-    <xsl:otherwise>Authors' Addresses</xsl:otherwise>
+    <xsl:when test="count(/rfc/front/author)=1">Authors' Addresses</xsl:when>
+    <xsl:otherwise>著者連絡先</xsl:otherwise>
   </xsl:choose>
 </xsl:template>
 
@@ -5256,7 +5256,7 @@ dd, li, p {
   <section myns:unnumbered="unnumbered" myns:notoclink="notoclink" anchor="{$anchor-prefix}.status">
   <xsl:attribute name="title">
     <xsl:choose>
-      <xsl:when test="$xml2rfc-rfcedstyle='yes'">Status of This Memo</xsl:when>
+      <xsl:when test="$xml2rfc-rfcedstyle='yes'">このメモの状態</xsl:when>
       <xsl:otherwise>Status of this Memo</xsl:otherwise>
     </xsl:choose>
   </xsl:attribute>
@@ -5486,7 +5486,7 @@ dd, li, p {
     </xsl:when>
     <xsl:when test="/rfc/@category='std' and $rfc-boilerplate='2010'">
       <t>
-        This is an Internet Standards Track document.
+        これは Internet Standards Track 文書です。
       </t>
     </xsl:when>
     <xsl:when test="/rfc/@category='std'">
@@ -5534,13 +5534,10 @@ dd, li, p {
       </xsl:if>
       <xsl:choose>
         <xsl:when test="$submissionType='IETF'">
-          This document is a product of the Internet Engineering Task Force
-          (IETF).
+          この文書は Internet Engineering Task Force (IETF) の成果物です。
           <xsl:choose>
             <xsl:when test="$consensus='yes'">
-              It represents the consensus of the IETF community.  It has
-              received public review and has been approved for publication by
-              the Internet Engineering Steering Group (IESG).
+              これは、IETF コミュニティの合意を表現するものであり、公開の査読を受け、Internet Engineering Steering Group (IESG) により発行が承認されました。
             </xsl:when>
             <xsl:otherwise>
               It has been approved for publication by the Internet Engineering
@@ -5602,8 +5599,7 @@ dd, li, p {
               Further information on BCPs is available in Section 2 of RFC 5741.
             </xsl:when>
             <xsl:when test="/rfc/@category='std'">
-              Further information on Internet Standards is available in Section
-              2 of RFC 5741.
+              Internet Standards に関するさらなる情報は RFC 5741 の2章に記述されています。
             </xsl:when>
             <xsl:otherwise>
               Not all documents approved by the IESG are a candidate for any
@@ -5627,9 +5623,9 @@ dd, li, p {
       </xsl:choose>
     </t>
     <t>
-      Information about the current status of this document, any errata, and
-      how to provide feedback on it may be obtained at
+      この文書の現在の状態やエラッタ、フィードバックの提供方法についての情報は
       <eref target="http://www.rfc-editor.org/info/rfc{/rfc/@number}">http://www.rfc-editor.org/info/rfc<xsl:value-of select="/rfc/@number"/></eref>.
+      で参照できます。
     </t>
   </xsl:if>
 
@@ -5640,7 +5636,7 @@ dd, li, p {
 
   <xsl:choose>
     <xsl:when test="$ipr-2008-11">
-      <section title="Copyright Notice" myns:unnumbered="unnumbered" myns:notoclink="notoclink" anchor="{$anchor-prefix}.copyrightnotice">
+      <section title="著作権表示" myns:unnumbered="unnumbered" myns:notoclink="notoclink" anchor="{$anchor-prefix}.copyrightnotice">
         <t>
           Copyright &#169; <xsl:value-of select="$xml2rfc-ext-pub-year" /> IETF Trust and the persons identified
           as the document authors.  All rights reserved.
@@ -6090,13 +6086,13 @@ dd, li, p {
 
   <xsl:if test="//figure[@title!='' or @anchor!='']">
     <ul class="toc">
-      <li>Figures
+      <li>図
         <ul>
           <xsl:for-each select="//figure[@title!='' or @anchor!='']">
             <xsl:variable name="n"><xsl:call-template name="get-figure-number"/></xsl:variable>
             <xsl:variable name="title">
               <xsl:if test="not(starts-with($n,'u'))">
-                <xsl:text>Figure </xsl:text>
+                <xsl:text>図 </xsl:text>
                 <xsl:value-of select="$n"/>
                 <xsl:if test="@title!=''">: </xsl:if>
               </xsl:if>
