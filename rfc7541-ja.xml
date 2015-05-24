@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-    This XML document is the output of clean-for-DTD.xslt; a tool that strips
-    extensions to RFC2629(bis) from documents for processing with xml2rfc.
--->
 <?xml-stylesheet type='text/xsl' href='lib/rfc2629.xslt' ?>
 <?rfc toc="yes"?>
 <?rfc symrefs="yes"?>
@@ -17,7 +13,7 @@
 <rfc ipr="trust200902" number="7541" category="std" consensus="yes">
     
     <front>
-        <title abbrev="HPACK">HPACK - HTTP/2 のためのヘッダ圧縮</title>
+        <title abbrev="HPACK">HPACK: HTTP/2 のためのヘッダ圧縮</title>
 
         <author initials="R." surname="Peon" fullname="Roberto Peon">
             <organization>Google, Inc</organization>
@@ -26,14 +22,14 @@
             </address>
         </author>
 
-        <author initials="H." surname="Ruellan" fullname="Hervé Ruellan">
+        <author initials="H." surname="Ruellan" fullname="Herve Ruellan">
             <organization>Canon CRF</organization>
             <address>
                 <email>herve.ruellan@crf.canon.fr</email>
             </address>
         </author>
 
-        <date year="2015"/>
+        <date month="May" year="2015"/>
         <area>Applications</area>
         <workgroup>HTTPbis Working Group</workgroup>
         <keyword>HTTP</keyword>
@@ -63,7 +59,8 @@
                 を効率的に表現することで非常に効率的にする
                 <xref target="DEFLATE">DEFLATE</xref> フォーマットを使用して
                 ヘッダフィールドを圧縮することによりこの無駄に取り組みました。
-                しかしながら、このアプローチは CRIME 攻撃で実証された通り
+                しかしながら、このアプローチは CRIME 
+                (Compression Ratio Info-leak Made Easy) 攻撃で実証された通り
                 セキュリティリスクがあります。 (<xref target="CRIME"/>を参照)
             </t>
 
@@ -374,8 +371,8 @@
                 </t>
                 <t>
                     アプリケーションに結果のヘッダフィールドを渡すことで、
-                    デコーダは動的テーブルの他に最低限の一時的なメモリ消費で
-                    実装できます。
+                    デコーダは動的テーブルが必要とするのとは別の一時的なメモリ消費を
+                    最低限にして実装できます。
                 </t>
             </section>
 
@@ -451,9 +448,9 @@
                     名前と値の長さで計算されます。
                 </t>
                 <t>
-                    <list style="hanging">
-                        <t hangText="注意:">
-                            エントリに関連付くオーバーヘッドとして追加の 32 
+                    <list>
+                        <t>
+                            注意: エントリに関連付くオーバーヘッドとして追加の 32 
                             オクテットを付加します。例として、エントリの名前と値を
                             参照するための 2 つの 64 ビットポインタと、名前と値への
                             参照数を数える 2 つの 64 ビット整数を使うエントリ構造
@@ -478,10 +475,10 @@
                     以下に留めなければなりません (MUST) 。
                 </t>
                 <t>
-                    動的テーブルの最大サイズの変更はエンコーディングコンテキスト更新 
+                    動的テーブルの最大サイズの変更は動的テーブルサイズ更新
                     (<xref target="encoding.context.update"/> を参照) から通知されます。
-                    エンコーディングコンテキスト更新は動的テーブルサイズの変更に続いて、最初の
-                    ヘッダブロックの先頭で行わなければなりません (MUST) 。
+                    この動的テーブルサイズ更新は動的テーブルサイズの変更の後に
+                    最初のヘッダブロックの先頭が続かなければなりません (MUST) 。
                     HTTP/2 において、これは設定同期 (<xref target="HTTP2"/> の 6.5.3 節を
                     参照) で追従します。
                 </t>
@@ -489,8 +486,8 @@
                     二つのヘッダブロックの送信の間に複数のテーブルサイズの最大値の
                     更新が起こる可能性があります。この場合このサイズはこの区間内に
                     一度以上変更され、区間内に現れた最小の最大テーブルサイズが
-                    エンコーディングコンテキスト更新内で通知されなければなりません (MUST) 。
-                    最終的な最大サイズは常に通知され、多くて二つのエンコーディングコンテキスト更新が
+                    動的テーブルサイズ更新内で通知されなければなりません (MUST) 。
+                    最終的な最大サイズは常に通知され、多くて二つの動的テーブルサイズ更新が
                     引き起こされます。これはデコーダがデコーダテーブルサイズに基づき
                     削除を実行することを可能にするのを確実にします (<xref target="entry.eviction"/> を参照) 。
                 </t>
@@ -647,8 +644,8 @@ else
 
             <section anchor="string.literal.representation" title="文字列リテラル表現">
                 <t>
-                    ヘッダフィールド名とヘッダフィールド値はリテラル文字列で
-                    表現できます。リテラル文字列は文字列リテラルの
+                    ヘッダフィールド名とヘッダフィールド値は文字列リテラルで
+                    表現できます。文字列リテラルは文字列リテラルの
                     オクテットに直接、もしくはハフマン符号
                     (<xref target="HUFFMAN"/> を参照) を
                     使用することでオクテットの連続としてエンコードされます。
@@ -664,7 +661,7 @@ else
 ]]></artwork>
                 </figure>
                 <t>
-                    リテラル文字列表現は下記のフィールドを含みます:
+                    文字列リテラル表現は下記のフィールドを含みます:
                     <list style="hanging">
                         <t hangText="H:">
                             1 ビットフラグ H 。文字列のオクテットがハフマン
@@ -715,7 +712,7 @@ else
         <section anchor="detailed.format" title="バイナリフォーマット">
             <t>
                 この節では様々なヘッダフィールド表現の詳細フォーマット
-                と、加えてエンコーディングコンテキストの更新命令について
+                と、加えて動的テーブルサイズ更新命令について
                 記述します。
             </t>
 
@@ -1016,13 +1013,13 @@ else
                     長さと推測した値が正しいという推量を確認できます。
                 </t>
                 <t>
-                    これは トランスポートレイヤセキュリティプロトコル (TLS、 
+                    これは トランスポートレイヤセキュリティ (TLS) プロトコル (
                     <xref target="TLS12"/> を参照) を用いても起こる可能性があります。なぜなら
                     TLS がコンテンツの秘密保護を提供していても、そのコンテンツの
                     長さに関しては限られた保護のみしか提供されないためです。
-                    <list style="hanging">
-                        <t hangText="注意:">
-                            パティングスキームは推測の増加数を与えらた推測に
+                    <list>
+                        <t>
+                            注意: パティングスキームは推測の増加数を与えらた推測に
                             関連した長さを学習することのみ強制する可能性が
                             あるような、これらの能力を持つ攻撃者に対する限られた
                             保護のみ提供します。
@@ -1116,12 +1113,12 @@ else
                         ヘッダフィールドの起源の良い情報を持たないエンコーダは
                         代わりに、更なる推測を効率的に防ぐため、将来の
                         のメッセージでヘッダフィールド値を推測するための大量の攻撃
-                        がそれ以上ヘッダフィールドと動的テーブルのエントリと
+                        がヘッダフィールドと動的テーブルのエントリと
                         比較されないようにするような、多くの異なる値をもつ
                         ヘッダフィールドに対する処置を行っても構いません。
-                        <list style="hanging">
-                            <t hangText="注意:">
-                                もし攻撃者が値の再入を行える信頼できる経路を
+                        <list>
+                            <t>
+                                注意: もし攻撃者が値の再入を行える信頼できる経路を
                                 持つ場合、動的テーブルからのヘッダフィールドに
                                 対応するエントリを単純に削除するのでは
                                 不十分である可能性があります。例えば、
@@ -1254,33 +1251,14 @@ else
 
         </section>
 
-        <section title="IANA への配慮">
-            <t>
-                このドキュメントには IANA アクションはありません。
-            </t>
-        </section>
-
-        <section title="謝辞">
-            <t>
-                この仕様は下記の個人から得た有益な情報を含んでいます:
-                <list style="symbols">
-                    <t>
-                        Mike Bishop, Jeff Pinner, Julian Reschke, Martin Thomson
-                        (価値ある編集上の貢献).
-                    </t>
-                    <t>
-                        Johnny Graettinger (ハフマン符号統計).
-                    </t>
-                </list>
-            </t>
-        </section>
     </middle>
 
     <back>
         <references title="引用文献">
-            <reference anchor="HTTP2">
+<!-- draft-ietf-httpbis-http2-17 Part of Cluster 243 -->
+            <reference anchor="HTTP2" target='http://www.rfc-editor.org/info/rfc7540'>
                 <front>
-                    <title>Hypertext Transfer Protocol version 2</title>
+                    <title>Hypertext Transfer Protocol Version 2 (HTTP/2)</title>
                     <author initials="M." surname="Belshe" fullname="Mike Belshe">
                         <organization>Twist</organization>
                     </author>
@@ -1290,9 +1268,9 @@ else
                     <author initials="M." surname="Thomson" fullname="Martin Thomson" role="editor">
                         <organization>Mozilla</organization>
                     </author>
-                    <date month="February" year="2015"/>
+                    <date month="May" year="2015"/>
                 </front>
-                <seriesInfo name="Internet-Draft" value="draft-ietf-httpbis-http2-17"/>
+                <seriesInfo name="RFC" value="7540"/>
                 
             </reference>
 
@@ -1433,14 +1411,10 @@ else
                 追加されています。
             </t>
             <t>
-                下記のテーブルは静的テーブルを構成する予め定義されたヘッダ
-                フィールドを列挙しています。
+                <xref target="static.table.entries"/> リストは静的テーブルを構成する
+                予め定義されたヘッダフィールドと各エントリのインデックスを列挙しています。
             </t>
             <texttable title="静的テーブルエントリ" anchor="static.table.entries">
-                <!-- An easy way to renumber these in vim, with mark a and b
-                     delimiting the table entries:
-                      :let @a=1 | 'a,'bs/>[0-9 ][0-9 ]*</\='>'.(@a+setreg('a',@a+1)).'<'/
-                -->
                 <ttcol>インデックス</ttcol>
                 <ttcol>ヘッダ名</ttcol>
                 <ttcol>ヘッダ値</ttcol>
@@ -1507,10 +1481,6 @@ else
                 <c>60</c><c>via</c><c/>
                 <c>61</c><c>www-authenticate</c><c/>
             </texttable>
-            <t>
-                <xref target="static.table.entries"/> は静的テーブル内の
-                各エントリのインデックスを与えます。
-            </t>
         </section>
 
         <section anchor="huffman.code" title="ハフマン符号">
@@ -1820,10 +1790,9 @@ EOS (256)  |11111111|11111111|11111111|111111      3fffffff  [30]
 
         <section anchor="examples" title="例">
             <t>
-                リクエストとレスポンス両方の、ハフマン符号化を伴う場合と
+                付録には、リクエストとレスポンス両方の、ハフマン符号化を伴う場合と
                 伴わない場合の、整数、ヘッダフィールド表現そしてヘッダ
-                フィールドのリストのすべてのエンコーディングを含む
-                数多くの例があります。
+                フィールドのリストのすべてのエンコーディングの例があります。
             </t>
 
             <section anchor="integer.representation.examples" title="整数表現の例">
@@ -1960,8 +1929,8 @@ custom-key: custom-header]]></artwork>
 6375 7374 6f6d 2d6b 6579                | custom-key
 0d                                      |   Literal value (len = 13)
 6375 7374 6f6d 2d68 6561 6465 72        | custom-header
-                                        | -> custom-key: custom-head\
-                                        |   er]]></artwork>
+                                        | -> custom-key:
+                                        |   custom-header]]></artwork>
             </figure>
         </t>
         <t>
@@ -2152,8 +2121,8 @@ password: secret]]></artwork>
                                         |     :authority
 0f                                      |   Literal value (len = 15)
 7777 772e 6578 616d 706c 652e 636f 6d   | www.example.com
-                                        | -> :authority: www.example\
-                                        |   .com]]></artwork>
+                                        | -> :authority: 
+                                        |   www.example.com]]></artwork>
             </figure>
         </t>
         <t>
@@ -2210,8 +2179,8 @@ cache-control: no-cache]]></artwork>
                                         | -> :path: /
 be                                      | == Indexed - Add ==
                                         |   idx = 62
-                                        | -> :authority: www.example\
-                                        |   .com
+                                        | -> :authority:
+                                        |   www.example.com
 58                                      | == Literal indexed ==
                                         |   Indexed name (idx = 24)
                                         |     cache-control
@@ -2277,15 +2246,15 @@ custom-key: custom-value]]></artwork>
                                         | -> :path: /index.html
 bf                                      | == Indexed - Add ==
                                         |   idx = 63
-                                        | -> :authority: www.example\
-                                        |   .com
+                                        | -> :authority:
+                                        |   www.example.com
 40                                      | == Literal indexed ==
 0a                                      |   Literal name (len = 10)
 6375 7374 6f6d 2d6b 6579                | custom-key
 0c                                      |   Literal value (len = 12)
 6375 7374 6f6d 2d76 616c 7565           | custom-value
-                                        | -> custom-key: custom-valu\
-                                        |   e]]></artwork>
+                                        | -> custom-key:
+                                        |   custom-value]]></artwork>
             </figure>
         </t>
         <t>
@@ -2357,8 +2326,8 @@ ff                                      | .]]></artwork>
 f1e3 c2e5 f23a 6ba0 ab90 f4ff           | .....:k.....
                                         |     Decoded:
                                         | www.example.com
-                                        | -> :authority: www.example\
-                                        |   .com]]></artwork>
+                                        | -> :authority:
+                                        |   www.example.com]]></artwork>
             </figure>
         </t>
         <t>
@@ -2415,8 +2384,8 @@ cache-control: no-cache]]></artwork>
                                         | -> :path: /
 be                                      | == Indexed - Add ==
                                         |   idx = 62
-                                        | -> :authority: www.example\
-                                        |   .com
+                                        | -> :authority:
+                                        |   www.example.com
 58                                      | == Literal indexed ==
                                         |   Indexed name (idx = 24)
                                         |     cache-control
@@ -2485,8 +2454,8 @@ a849 e95b b8e8 b4bf                     | .I.[....]]></artwork>
                                         | -> :path: /index.html
 bf                                      | == Indexed - Add ==
                                         |   idx = 63
-                                        | -> :authority: www.example\
-                                        |   .com
+                                        | -> :authority:
+                                        |   www.example.com
 40                                      | == Literal indexed ==
 88                                      |   Literal name (len = 8)
                                         |     Huffman encoded:
@@ -2498,8 +2467,8 @@ bf                                      | == Indexed - Add ==
 25a8 49e9 5bb8 e8b4 bf                  | %.I.[....
                                         |     Decoded:
                                         | custom-value
-                                        | -> custom-key: custom-valu\
-                                        |   e]]></artwork>
+                                        | -> custom-key:
+                                        |   custom-value]]></artwork>
             </figure>
         </t>
         <t>
@@ -2577,7 +2546,7 @@ location: https://www.example.com]]></artwork>
 1d                                      |   Literal value (len = 29)
 4d6f 6e2c 2032 3120 4f63 7420 3230 3133 | Mon, 21 Oct 2013
 2032 303a 3133 3a32 3120 474d 54        |  20:13:21 GMT
-                                        | -> date: Mon, 21 Oct 2013 \
+                                        | -> date: Mon, 21 Oct 2013
                                         |   20:13:21 GMT
 6e                                      | == Literal indexed ==
                                         |   Indexed name (idx = 46)
@@ -2585,8 +2554,8 @@ location: https://www.example.com]]></artwork>
 17                                      |   Literal value (len = 23)
 6874 7470 733a 2f2f 7777 772e 6578 616d | https://www.exam
 706c 652e 636f 6d                       | ple.com
-                                        | -> location: https://www.e\
-                                        |   xample.com]]></artwork>
+                                        | -> location:
+                                        |   https://www.example.com]]></artwork>
             </figure>
         </t>
         <t>
@@ -2650,12 +2619,12 @@ c1                                      | == Indexed - Add ==
                                         | -> cache-control: private
 c0                                      | == Indexed - Add ==
                                         |   idx = 64
-                                        | -> date: Mon, 21 Oct 2013 \
+                                        | -> date: Mon, 21 Oct 2013
                                         |   20:13:21 GMT
 bf                                      | == Indexed - Add ==
                                         |   idx = 63
-                                        | -> location: https://www.e\
-                                        |   xample.com]]></artwork>
+                                        | -> location:
+                                        |   https://www.example.com]]></artwork>
             </figure>
         </t>
         <t>
@@ -2727,20 +2696,20 @@ c1                                      | == Indexed - Add ==
 1d                                      |   Literal value (len = 29)
 4d6f 6e2c 2032 3120 4f63 7420 3230 3133 | Mon, 21 Oct 2013
 2032 303a 3133 3a32 3220 474d 54        |  20:13:22 GMT
-                                        | - evict: cache-control: pr\
-                                        |   ivate
-                                        | -> date: Mon, 21 Oct 2013 \
+                                        | - evict: cache-control:
+                                        |   private
+                                        | -> date: Mon, 21 Oct 2013
                                         |   20:13:22 GMT
 c0                                      | == Indexed - Add ==
                                         |   idx = 64
-                                        | -> location: https://www.e\
-                                        |   xample.com
+                                        | -> location: 
+                                        |   https://www.example.com
 5a                                      | == Literal indexed ==
                                         |   Indexed name (idx = 26)
                                         |     content-encoding
 04                                      |   Literal value (len = 4)
 677a 6970                               | gzip
-                                        | - evict: date: Mon, 21 Oct\
+                                        | - evict: date: Mon, 21 Oct 
                                         |    2013 20:13:21 GMT
                                         | -> content-encoding: gzip
 77                                      | == Literal indexed ==
@@ -2751,11 +2720,11 @@ c0                                      | == Indexed - Add ==
 5157 454f 5049 5541 5851 5745 4f49 553b | QWEOPIUAXQWEOIU;
 206d 6178 2d61 6765 3d33 3630 303b 2076 |  max-age=3600; v
 6572 7369 6f6e 3d31                     | ersion=1
-                                        | - evict: location: https:/\
-                                        |   /www.example.com
+                                        | - evict: location:
+                                        |   https://www.example.com
                                         | - evict: :status: 307
-                                        | -> set-cookie: foo=ASDJKHQ\
-                                        |   KBZXOQWEOPIUAXQWEOIU; ma\
+                                        | -> set-cookie: foo=ASDJKHQ
+                                        |   KBZXOQWEOPIUAXQWEOIU; ma
                                         |   x-age=3600; version=1]]></artwork>
             </figure>
         </t>
@@ -2763,8 +2732,8 @@ c0                                      | == Indexed - Add ==
             <figure>
                 <preamble>動的テーブル (デコード後):</preamble>
                 <artwork><![CDATA[
-[  1] (s =  98) set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age\
-                 =3600; version=1
+[  1] (s =  98) set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU;
+                 max-age=3600; version=1
 [  2] (s =  52) content-encoding: gzip
 [  3] (s =  65) date: Mon, 21 Oct 2013 20:13:22 GMT
       Table size: 215]]></artwork>
@@ -2844,9 +2813,9 @@ aec3 771a 4b                            | ..w.K
 d07a be94 1054 d444 a820 0595 040b 8166 | .z...T.D. .....f
 e082 a62d 1bff                          | ...-..
                                         |     Decoded:
-                                        | Mon, 21 Oct 2013 20:13:21 \
+                                        | Mon, 21 Oct 2013 20:13:21
                                         | GMT
-                                        | -> date: Mon, 21 Oct 2013 \
+                                        | -> date: Mon, 21 Oct 2013
                                         |   20:13:21 GMT
 6e                                      | == Literal indexed ==
                                         |   Indexed name (idx = 46)
@@ -2857,8 +2826,8 @@ e082 a62d 1bff                          | ...-..
 d3                                      | .
                                         |     Decoded:
                                         | https://www.example.com
-                                        | -> location: https://www.e\
-                                        |   xample.com]]></artwork>
+                                        | -> location:
+                                        |   https://www.example.com]]></artwork>
             </figure>
         </t>
         <t>
@@ -2925,12 +2894,12 @@ c1                                      | == Indexed - Add ==
                                         | -> cache-control: private
 c0                                      | == Indexed - Add ==
                                         |   idx = 64
-                                        | -> date: Mon, 21 Oct 2013 \
+                                        | -> date: Mon, 21 Oct 2013
                                         |   20:13:21 GMT
 bf                                      | == Indexed - Add ==
                                         |   idx = 63
-                                        | -> location: https://www.e\
-                                        |   xample.com]]></artwork>
+                                        | -> location:
+                                        |   https://www.example.com]]></artwork>
             </figure>
         </t>
         <t>
@@ -3002,16 +2971,16 @@ c1                                      | == Indexed - Add ==
 d07a be94 1054 d444 a820 0595 040b 8166 | .z...T.D. .....f
 e084 a62d 1bff                          | ...-..
                                         |     Decoded:
-                                        | Mon, 21 Oct 2013 20:13:22 \
+                                        | Mon, 21 Oct 2013 20:13:22
                                         | GMT
-                                        | - evict: cache-control: pr\
-                                        |   ivate
-                                        | -> date: Mon, 21 Oct 2013 \
+                                        | - evict: cache-control:
+                                        |   private
+                                        | -> date: Mon, 21 Oct 2013 
                                         |   20:13:22 GMT
 c0                                      | == Indexed - Add ==
                                         |   idx = 64
-                                        | -> location: https://www.e\
-                                        |   xample.com
+                                        | -> location:
+                                        |   https://www.example.com
 5a                                      | == Literal indexed ==
                                         |   Indexed name (idx = 26)
                                         |     content-encoding
@@ -3020,7 +2989,7 @@ c0                                      | == Indexed - Add ==
 9bd9 ab                                 | ...
                                         |     Decoded:
                                         | gzip
-                                        | - evict: date: Mon, 21 Oct\
+                                        | - evict: date: Mon, 21 Oct
                                         |    2013 20:13:21 GMT
                                         | -> content-encoding: gzip
 77                                      | == Literal indexed ==
@@ -3032,14 +3001,14 @@ ad                                      |   Literal value (len = 45)
 d5af 2708 7f36 72c1 ab27 0fb5 291f 9587 | ..'..6r..'..)...
 3160 65c0 03ed 4ee5 b106 3d50 07        | 1`e...N...=P.
                                         |     Decoded:
-                                        | foo=ASDJKHQKBZXOQWEOPIUAXQ\
-                                        | WEOIU; max-age=3600; versi\
+                                        | foo=ASDJKHQKBZXOQWEOPIUAXQ
+                                        | WEOIU; max-age=3600; versi
                                         | on=1
-                                        | - evict: location: https:/\
-                                        |   /www.example.com
+                                        | - evict: location:
+                                        |   https://www.example.com
                                         | - evict: :status: 307
-                                        | -> set-cookie: foo=ASDJKHQ\
-                                        |   KBZXOQWEOPIUAXQWEOIU; ma\
+                                        | -> set-cookie: foo=ASDJKHQ
+                                        |   KBZXOQWEOPIUAXQWEOIU; ma
                                         |   x-age=3600; version=1]]></artwork>
             </figure>
         </t>
@@ -3047,8 +3016,8 @@ d5af 2708 7f36 72c1 ab27 0fb5 291f 9587 | ..'..6r..'..)...
             <figure>
                 <preamble>動的テーブル (デコード後):</preamble>
                 <artwork><![CDATA[
-[  1] (s =  98) set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age\
-                 =3600; version=1
+[  1] (s =  98) set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU;
+                 max-age=3600; version=1
 [  2] (s =  52) content-encoding: gzip
 [  3] (s =  65) date: Mon, 21 Oct 2013 20:13:22 GMT
       Table size: 215]]></artwork>
@@ -3072,7 +3041,20 @@ set-cookie: foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1]]></artwork
 <!-- example-end -->
 
         </section>
-
+        <section title="謝辞">
+            <t>
+                この仕様は下記の個人から得た有益な情報を含んでいます:
+                <list style="symbols">
+                    <t>
+                        Mike Bishop, Jeff Pinner, Julian Reschke, Martin Thomson
+                        (価値ある編集上の貢献).
+                    </t>
+                    <t>
+                        Johnny Graettinger (ハフマン符号統計).
+                    </t>
+                </list>
+            </t>
+        </section>
 
     </back>
 </rfc><!--
